@@ -1,0 +1,28 @@
+export default {
+    id: 0,
+    name: "",
+    type: "add",
+    surname: "",
+    fullname:"",
+    phone: "",
+    otherphone: "",
+    email: "",
+    tc: "",
+    address: "",
+    birthday: "",
+    isActive: true,
+    gender: 1,
+    emailnotification: true,
+    status: {'school': false, 'activity': false, 'sporclub': false},
+    smsnotification: true,
+    proximities: 1,
+    file: null,
+    file_id: 1,
+    file_path: "",
+    title: 1,
+    province:1,
+    job: "",
+    unit: 1,
+    student_id: 0
+}
+//user - usertypes many to many ilişkisi
