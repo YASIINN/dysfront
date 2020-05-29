@@ -81,15 +81,15 @@ import Flex from "@/components/layout";
 import tooltip from "@/components/tooltip";
 import FlexCard from "@/components/flexwithcard";
 import Swal from "sweetalert2";
-
+import loadingMixins from '@/mixins/loading'
 export default {
+  mixins:[loadingMixins],
   name: "schoolclasestasktable",
   data() {
     return {
       uscmoreParams: {},
       txt: "",
       currentData: [],
-      loading: false
     };
   },
   components: {
@@ -176,7 +176,7 @@ export default {
         showCancelButton: true
       }).then(res => {
         if (res.value) {
-          this.loading = true;
+          this.onOpenIndıcator();
           console.log(item);
           this.$store
             .dispatch("deleteUserSchoolClases", {
@@ -211,7 +211,7 @@ export default {
               }
 
               this.$refs.vuetable3.reload();
-              this.loading = false;
+              this.onCloseIndıcator();
             });
         }
       });
@@ -221,13 +221,14 @@ export default {
       this.$refs.paginationInfo3.setPaginationData(paginationData);
     },
     onUserSchoolClasesLoading() {
-      this.loading = true;
+      this.onOpenIndıcator();
     },
     onUserSchoolClasesLoaded() {
-      this.loading = false;
+
+      this.onCloseIndıcator();
     },
     onUserSchoolClasesError(err) {
-      this.loading = false;
+      this.onCloseIndıcator();
       appPlugin.showalert(this.$t("getRecordErro"), "", "error", this.$t("ok"));
     },
     onUserSchoolClasesSucces() {},

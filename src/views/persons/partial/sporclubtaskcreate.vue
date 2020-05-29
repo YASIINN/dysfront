@@ -80,208 +80,211 @@
 </template>
 
 <script>
-import tooltip from "@/components/tooltip";
-import {
-  VTabs,
-  FlexCard,
-  VTabContent,
-  MaskedInput,
-  SearchBox,
-  Loading,
-  Multiselect,
-  VSelect,
-  Flex,
-  VButton,
-  VInput,
-  VTooltipButton,
-  Vuetable,
-  VuetablePaginationBootstrap,
-  VuetablePaginationInfo,
-  appPlugin
-} from "@/Providers/defaultImports";
-import { Datetime } from "vue-datetime";
-
-export default {
-  props: {
-    user: {}
-  },
-  computed: {
-    isInvalid() {
-      return this.isTouched && this.personSporClubData === 0;
-    }
-  },
-  name: "sporclubtaskcreate",
-  methods: {
-    saveUserSporClub() {
-      if (this.sporclubtaskstatus == 0) {
-        if (this.personSporClubData.length < 1) {
-          appPlugin.showalert(
-            "Uyarı",
-            "Lütfen Personelin Görevli Olduğu Spor Kulübünü Seçiniz",
-            "info",
-            "Tamam"
-          );
-        } else if (this.sporClubTB.length < 1) {
-          appPlugin.showalert(
-            "Uyarı",
-            "Lütfen Personelin Görevli Olduğu Spor Kulübüne Ait Takım ve Şube Seçiniz",
-            "info",
-            "Tamam"
-          );
-        } else {
-          this.savePersonSC();
-        }
-      } else {
-        if (this.personSporClubData.length < 1) {
-          appPlugin.showalert(
-            "Uyarı",
-            "Lütfen Personelin Görevli Olduğu Spor Kulübünü Seçiniz",
-            "info",
-            "Tamam"
-          );
-        } else {
-          this.savePersonSC();
-        }
-      }
-    },
-    savePersonSCTeamBranch(userID) {
-      this.loading = true;
-      let data = [];
-      this.sporClubTB.forEach(item => {
-        data.push({
-          userid: userID,
-          sporclubid: item.spor_club_id,
-          teamid: item.team_id,
-          branchid: item.sbranch_id
-        });
-      });
-      this.$store
-        .dispatch("createUserSporClubTeam", { usersporclubteamlist: data })
-        .then(res => {
-          if (res.status) {
-            if (res.status == 200) {
-              this.personSporClubData = [];
-              this.sporClubTB = [];
-              appPlugin.showalert(
-                "Personel Görevlendirme İşlemi Başarılı",
-                "",
-                "success",
-                "Tamam"
-              );
-              this.loading = false;
-            } else {
-              appPlugin.showalert(
-                "Uyarı",
-                "Personel Spor Kulübü Takımlarına Görevlendirilirken Hata Gerçekleşti ",
-                "error",
-                "Tamam"
-              );
-              this.loading = false;
-            }
-          } else {
-            appPlugin.showalert(
-              "Uyarı",
-              "Personel Spor Kulübü Takımlarına Görevlendirilirken Hata Gerçekleşti ",
-              "error",
-              "Tamam"
-            );
-            this.loading = false;
-          }
-        })
-        .catch(err => {
-          this.loading = false;
-          appPlugin.showalert(
-            "Uyarı",
-            "Personel Spor Kulübü Takımlarına Görevlendirilirken Hata Gerçekleşti ",
-            "error",
-            "Tamam"
-          );
-        });
-    },
-    savePersonSC() {
-      this.loading = true;
-      this.$store
-        .dispatch("createUserSporClub", {
-          usersporclublist: [
-            {
-              sporclubid: this.personSporClubData.id,
-              userid: this.user.id
-            }
-          ]
-        })
-        .then(res => {
-          if (this.sporclubtaskstatus == 1) {
-            this.personSporClubData = [];
-            this.sporClubTB = [];
-            appPlugin.showalert(
-              "Personel Görevlendirme İşlemi Başarılı",
-              "",
-              "success",
-              "Tamam"
-            );
-            this.loading = false;
-          } else {
-            this.savePersonSCTeamBranch(this.user.id);
-          }
-        })
-        .catch(err => {});
-    },
-    onChangeSporClub(data) {
-      this.loading = true;
-
-      this.$store
-        .dispatch("fetchAllSCTeamBranch", {
-          query: appPlugin.urlParse(
-            "spor_club_team_branch.spor_club_id=" + data.id
-          )
-        })
-        .then(res => {
-          if (res.status == 200 && res.data) {
-            res.data.forEach(item => {
-              item.tb = item.stName + " " + item.sbName;
-            });
-            this.sporClubTBData = res.data;
-          }
-          this.loading = false;
-        })
-        .catch(err => {
-          this.loading = false;
-        });
-    },
-    onTouch() {
-      this.isTouched = true;
-    }
-  },
-  data() {
-    return {
-      loading: false,
-      personSporClubData: [],
-      isTouched: false,
-      sporClubTB: [],
-      sporClubTBData: [],
-      sporclubtaskstatus: 0
-    };
-  },
-  components: {
-    tooltip,
-    Flex,
-    FlexCard,
-    VSelect,
+  import tooltip from '@/components/tooltip'
+  import {
     VTabs,
+    FlexCard,
     VTabContent,
     MaskedInput,
     SearchBox,
     Loading,
-    VInput,
-    VButton,
-    VTooltipButton,
     Multiselect,
-    datetime: Datetime,
+    VSelect,
+    Flex,
+    VButton,
+    VInput,
+    VTooltipButton,
     Vuetable,
     VuetablePaginationBootstrap,
-    VuetablePaginationInfo
+    VuetablePaginationInfo,
+    appPlugin
+  } from '@/Providers/defaultImports'
+  import { Datetime } from 'vue-datetime'
+  import loadingMixins from '@/mixins/loading'
+
+  export default {
+    mixins: [loadingMixins],
+    props: {
+      user: {}
+    },
+    computed: {
+      isInvalid () {
+        return this.isTouched && this.personSporClubData === 0
+      }
+    },
+    name: 'sporclubtaskcreate',
+    methods: {
+      saveUserSporClub () {
+        if (this.sporclubtaskstatus == 0) {
+          if (this.personSporClubData.length < 1) {
+            appPlugin.showalert(
+              'Uyarı',
+              'Lütfen Personelin Görevli Olduğu Spor Kulübünü Seçiniz',
+              'info',
+              'Tamam'
+            )
+          } else if (this.sporClubTB.length < 1) {
+            appPlugin.showalert(
+              'Uyarı',
+              'Lütfen Personelin Görevli Olduğu Spor Kulübüne Ait Takım ve Şube Seçiniz',
+              'info',
+              'Tamam'
+            )
+          } else {
+            this.savePersonSC()
+          }
+        } else {
+          if (this.personSporClubData.length < 1) {
+            appPlugin.showalert(
+              'Uyarı',
+              'Lütfen Personelin Görevli Olduğu Spor Kulübünü Seçiniz',
+              'info',
+              'Tamam'
+            )
+          } else {
+            this.savePersonSC()
+          }
+        }
+      },
+      savePersonSCTeamBranch (userID) {
+
+        this.onOpenIndıcator()
+        let data = []
+        this.sporClubTB.forEach(item => {
+          data.push({
+            userid: userID,
+            sporclubid: item.spor_club_id,
+            teamid: item.team_id,
+            branchid: item.sbranch_id
+          })
+        })
+        this.$store
+          .dispatch('createUserSporClubTeam', { usersporclubteamlist: data })
+          .then(res => {
+            if (res.status) {
+              if (res.status == 200) {
+                this.personSporClubData = []
+                this.sporClubTB = []
+                appPlugin.showalert(
+                  'Personel Görevlendirme İşlemi Başarılı',
+                  '',
+                  'success',
+                  'Tamam'
+                )
+                this.onCloseIndıcator()
+              } else {
+                appPlugin.showalert(
+                  'Uyarı',
+                  'Personel Spor Kulübü Takımlarına Görevlendirilirken Hata Gerçekleşti ',
+                  'error',
+                  'Tamam'
+                )
+                this.onCloseIndıcator()
+              }
+            } else {
+              appPlugin.showalert(
+                'Uyarı',
+                'Personel Spor Kulübü Takımlarına Görevlendirilirken Hata Gerçekleşti ',
+                'error',
+                'Tamam'
+              )
+              this.onCloseIndıcator()
+            }
+          })
+          .catch(err => {
+            this.onCloseIndıcator()
+            appPlugin.showalert(
+              'Uyarı',
+              'Personel Spor Kulübü Takımlarına Görevlendirilirken Hata Gerçekleşti ',
+              'error',
+              'Tamam'
+            )
+          })
+      },
+      savePersonSC () {
+        this.onOpenIndıcator()
+        this.$store
+          .dispatch('createUserSporClub', {
+            usersporclublist: [
+              {
+                sporclubid: this.personSporClubData.id,
+                userid: this.user.id
+              }
+            ]
+          })
+          .then(res => {
+            if (this.sporclubtaskstatus == 1) {
+              this.personSporClubData = []
+              this.sporClubTB = []
+              appPlugin.showalert(
+                'Personel Görevlendirme İşlemi Başarılı',
+                '',
+                'success',
+                'Tamam'
+              )
+              this.onCloseIndıcator()
+            } else {
+              this.savePersonSCTeamBranch(this.user.id)
+            }
+          })
+          .catch(err => {
+          })
+      },
+      onChangeSporClub (data) {
+        this.onOpenIndıcator()
+
+        this.$store
+          .dispatch('fetchAllSCTeamBranch', {
+            query: appPlugin.urlParse(
+              'spor_club_team_branch.spor_club_id=' + data.id
+            )
+          })
+          .then(res => {
+            if (res.status == 200 && res.data) {
+              res.data.forEach(item => {
+                item.tb = item.stName + ' ' + item.sbName
+              })
+              this.sporClubTBData = res.data
+            }
+            this.onCloseIndıcator()
+          })
+          .catch(err => {
+            this.onCloseIndıcator()
+          })
+      },
+      onTouch () {
+        this.isTouched = true
+      }
+    },
+    data () {
+      return {
+        personSporClubData: [],
+        isTouched: false,
+        sporClubTB: [],
+        sporClubTBData: [],
+        sporclubtaskstatus: 0
+      }
+    },
+    components: {
+      tooltip,
+      Flex,
+      FlexCard,
+      VSelect,
+      VTabs,
+      VTabContent,
+      MaskedInput,
+      SearchBox,
+      Loading,
+      VInput,
+      VButton,
+      VTooltipButton,
+      Multiselect,
+      datetime: Datetime,
+      Vuetable,
+      VuetablePaginationBootstrap,
+      VuetablePaginationInfo
+    }
   }
-};
 </script>
 
 <style scoped>

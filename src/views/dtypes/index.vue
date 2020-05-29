@@ -112,35 +112,17 @@
 <script>
   import { FETCH_PDTYPE, CREATE_DTYPE, DELETE_DTYPE, UPDATE_DTYPE } from '@/store/modules/dtype/moduleNames'
   import {
-    SearchBox,
-    Loading,
-    FlexCard,
-    Flex,
-    VButton,
-    required,
-    VInput,
-    VTooltipButton,
-    Vuetable,
     Swal,
-    VuetablePaginationBootstrap,
-    VuetablePaginationInfo,
-    appPlugin
+    appPlugin,
+    required,
   } from '@/Providers/defaultImports'
+  import loadingMixins from '@/mixins/loading'
+  import vuetableMixins from '@/mixins/vuetable'
+  import defaulcomponentsMixins from '@/mixins/defaultcomponents'
 
   export default {
     name: 'index',
-    components: {
-      Flex,
-      FlexCard,
-      SearchBox,
-      Loading,
-      VInput,
-      VButton,
-      VTooltipButton,
-      Vuetable,
-      VuetablePaginationBootstrap,
-      VuetablePaginationInfo
-    },
+    mixins: [loadingMixins, defaulcomponentsMixins, vuetableMixins],
     validations: {
       dtypeData: {
         name: {
@@ -150,41 +132,16 @@
     },
     data () {
       return {
-        currentData: [],
-        moreParams: {},
-        txt: '',
-        loading: false,
-        dataselected: false,
         dtypeData: {
           name: '',
           code: ''
         },
-        selectedData: {}
       }
     },
 
     created () {
     },
     methods: {
-      onChangePage (page) {
-        this.$refs.vuetable.changePage(page)
-      },
-      onPaginationData (paginationData) {
-        this.$refs.pagination.setPaginationData(paginationData)
-        this.$refs.paginationInfo.setPaginationData(paginationData)
-      },
-      onLoading () {
-        this.loading = true
-      },
-      onLoaded () {
-        this.loading = false
-      },
-      onSearchHandler (txt) {
-        this.txt = txt
-        this.$nextTick(function () {
-          this.$refs.vuetable.refresh()
-        })
-      },
       onDelete (item, i) {
         Swal.fire({
           title: item.dtName + ' ' + this.$t('sureDelete'),
@@ -195,7 +152,7 @@
           showCancelButton: true
         }).then(res => {
           if (res.value) {
-            this.loading = true
+            this.onCloseIndıcator()
             this.$store
               .dispatch(DELETE_DTYPE, {
                 deleted: item,
@@ -221,7 +178,7 @@
                 }
 
                 this.onRefreshTableContent()
-                this.loading = false
+                this.onCloseIndıcator()
               })
           }
         })
@@ -233,17 +190,6 @@
           name: '',
         }
       },
-      onError (err) {
-
-        this.loading = false
-
-        appPlugin.showalert(
-          this.$t('getRecordErro'),
-          '',
-          'error',
-          this.$t('ok')
-        )
-      },
       onUpdate () {
         if (this.$v.dtypeData.name.$invalid) {
           appPlugin.showalert(
@@ -253,7 +199,7 @@
             this.$t('ok')
           )
         } else {
-          this.loading = true
+          this.onCloseIndıcator()
           this.$store.dispatch(UPDATE_DTYPE, this.dtypeData).then(res => {
             if (res.status) {
               if (res.status === 200) {
@@ -280,17 +226,10 @@
               )
             }
             this.onRefreshTableContent()
-            this.loading = false
+            this.onCloseIndıcator()
             this.onResetData()
           })
         }
-      },
-      onSuccess () {
-        /* succesFetchDataApi */
-      },
-      onCancel () {
-        this.dataselected = !this.dataselected
-        this.onResetData()
       },
       onSelectData (data) {
         this.dataselected = true
@@ -298,9 +237,6 @@
           name: data.dtName,
           id: data.id
         }
-      },
-      onRefreshTableContent () {
-        this.$refs.vuetable.reload()
       },
       onFetchApi (apiUrl, httpOptions) {
         var data
@@ -333,7 +269,7 @@
             this.$t('ok')
           )
         } else {
-          this.loading = true
+          this.onCloseIndıcator()
           let data = {
             created: this.dtypeData,
           }
@@ -360,7 +296,7 @@
               )
             }
             this.onRefreshTableContent()
-            this.loading = false
+            this.onCloseIndıcator()
           })
         }
       }

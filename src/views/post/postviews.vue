@@ -36,8 +36,10 @@
   } from '@/Providers/defaultImports'
   import { FETCH_POST_VIEW_USER } from '../../store/modules/post/moduleNames'
   import defaultImage from '@/assets/img/defaultavatar.png'
+  import loadingMixins from '@/mixins/loading'
 
   export default {
+    mixins: [loadingMixins],
     components: {
       FlexCard,
       Flex,
@@ -51,12 +53,12 @@
         if (isNaN(this.$route.params.id)) {
           this.$router.push('/social')
         } else {
-          this.loading = true
+          this.onOpenIndıcator()
           this.$store.dispatch(FETCH_POST_VIEW_USER, { id: this.$route.params.id }).then((res) => {
-            this.loading = false
+            this.onCloseIndıcator()
           }).catch((err) => {
             this.$router.push('/social')
-            this.loading = false
+            this.onCloseIndıcator()
           })
         }
       }
@@ -64,7 +66,6 @@
     data () {
       return {
         defaultPreview: defaultImage,
-        loading: false,
       }
     },
     name: 'postlikes'

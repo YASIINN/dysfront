@@ -161,8 +161,10 @@
   import defaultImage from '@/assets/img/defaultavatar.png'
   import MsgPopup from '@/components/msgpopup/index'
   import { FETCH_ALL_USERSSEARCH } from '../../store/modules/users/moduleNames'
+  import loadingMixins from '@/mixins/loading'
 
   export default {
+    mixins: [loadingMixins],
     created () {
       this.fetchUserRecentMsg()
       debugger
@@ -183,7 +185,7 @@
       loadMore () {
         debugger
         let query = []
-        this.loading = true
+        this.onOpenIndıcator()
         query = appPlugin.urlParse('uİsActive=1'
           + (this.searchTxt.trim() == '' ? '' : '& uFullName%' + this.searchTxt))
         if (this.nextpageurl == this.lastpageurl) {
@@ -207,16 +209,16 @@
               this.lastpageurl = res.data.last_page_url
               this.nextpageurl = res.data.next_page_url
             }
-            this.loading = false
+            this.onCloseIndıcator()
           }).catch((err) => {
             debugger
-            this.loading = false
+            this.onCloseIndıcator()
             appPlugin.showalert(this.$t('warning'),
               this.$t('fetchError'), 'error',
               this.$t('ok'))
           })
           this.nextpageurl = ''
-          this.loading = false
+          this.onCloseIndıcator()
         } else {
           debugger
           this.$store.dispatch(FETCH_NEXT_CONTACTS, {
@@ -232,15 +234,15 @@
               debugger
               this.nextpageurl = res.data.next_page_url
             }
-            this.loading = false
+            this.onCloseIndıcator()
           }).catch((err) => {
             debugger
-            this.loading = false
+            this.onCloseIndıcator()
             appPlugin.showalert(this.$t('warning'),
               this.$t('fetchError'), 'error',
               this.$t('ok'))
           })
-          this.loading = false
+          this.onCloseIndıcator()
         }
       },
       createNewUserMsg (data) {
@@ -251,7 +253,7 @@
           fromuserid: this.selectedContact.id,
           ncontent: data
         }
-        this.loading = true
+        this.onOpenIndıcator()
         this.$store.dispatch(CREATE_USER_NOTES, payload).then((res) => {
           debugger
           let outgoing = _.groupBy(res.data, 'from_user_id')
@@ -281,19 +283,19 @@
           /*   this.userNotesList[this.selectedNoteListIndex].lastmsg = res.data.content
              this.userNotesList[this.selectedNoteListIndex].date = res.data.created_at
              this.content = ''*/
-          this.loading = false
+          this.onCloseIndıcator()
         }).catch((err) => {
           debugger
-          this.loading = false
+          this.onCloseIndıcator()
         })
       },
       fetchContactList (payload) {
         debugger
-        this.loading = true
+        this.onOpenIndıcator()
 
         this.$store.dispatch(FETCH_ALL_USERSSEARCH, payload).then((res) => {
           debugger
-          this.loading = false
+          this.onCloseIndıcator()
           if (res.data.next_page_url != null) {
             this.nextpageurl = res.data.next_page_url
           }
@@ -308,7 +310,7 @@
             })
           }
         }).catch((err) => {
-          this.loading = false
+          this.onCloseIndıcator()
           appPlugin.showalert(this.$t('warning'),
             this.$t('fetchError'), 'error',
             this.$t('ok'))
@@ -337,9 +339,9 @@
           this.userNotesList.splice(i, 1)
           this.contactUser = []
 
-          this.loading = false
+          this.onCloseIndıcator()
         }).catch((err) => {
-          this.loading = false
+          this.onCloseIndıcator()
           debugger
         })
         //genel mesaj kutusundan silinecek tamamen
@@ -349,13 +351,13 @@
         this.$store.commit('setpopupstyle', 'block')
       },
       reloadUserMsgContent () {
-        this.loading = true
+        this.onOpenIndıcator()
         let payload = {
           touserid: this.selectedUser.id,
           userid: 2
         }
         this.$store.dispatch(SHOW_USER_NOTE, payload).then((res) => {
-          this.loading = false
+          this.onCloseIndıcator()
           debugger
           //isRead
           //USER ID
@@ -397,20 +399,20 @@
           /*   this.userNotesList[this.selectedNoteListIndex][this.selectedUser.id] = res.data*/
           console.log('yenileme', res)
         }).catch((err) => {
-          this.loading = false
+          this.onCloseIndıcator()
           appPlugin.showalert(this.$t('warning'), 'Mesajlar Yenilenirken Hata Gerçekleşti', 'error', this.$t('ok'))
         })
       },
       onDeleteMsg (msg, index) {
         debugger
-        this.loading = true
+        this.onOpenIndıcator()
         this.$store.dispatch(DELETE_USER_NOTES, { id: msg.id }).then((res) => {
-          this.loading = false
+          this.onCloseIndıcator()
           this.selectedUserMsg.splice(index, 1)
           this.userNotesList[this.selectedNoteListIndex].lastmsg = this.selectedUserMsg[this.selectedUserMsg.length - 1].content
           this.userNotesList[this.selectedNoteListIndex].date = this.selectedUserMsg[this.selectedUserMsg.length - 1].created_at
         }).catch((err) => {
-          this.loading = false
+          this.onCloseIndıcator()
           appPlugin.showalert(this.$t('warning'), this.$t('deleteRecordErrMsg'), 'error', this.$t('ok'))
         })
         /*  this.selectedUserMsg.splice(index,1);*/
@@ -419,7 +421,7 @@
         if (this.content.trim() == '') {
           appPlugin.showalert(this.$t('warning'), 'Mesaj Boş Gönderilemez', 'info', this.$t('ok'))
         } else {
-          this.loading = true
+          this.onOpenIndıcator()
           let payload = {
             touserid: 2,
             fromuserid: this.selectedUser.id,
@@ -434,23 +436,23 @@
             this.userNotesList[this.selectedNoteListIndex].lastmsg = res.data[0].content
             this.userNotesList[this.selectedNoteListIndex].date = res.data[0].created_at
             this.content = ''
-            this.loading = false
+            this.onCloseIndıcator()
           }).catch((err) => {
             debugger
-            this.loading = false
+            this.onCloseIndıcator()
           })
         }
 
       },
       isReadMessage (payload) {
         let deferred = new Promise(((resolve, reject) => {
-          this.loading = true
+          this.onOpenIndıcator()
           this.$store.dispatch(UPDATE_USER_NOTES, { urlparse: payload }).then((res) => {
             debugger
-            this.loading = false
+            this.onCloseIndıcator()
             resolve(true)
           }).catch((err) => {
-            this.loading = false
+            this.onCloseIndıcator()
             appPlugin.showalert(this.$t('warning'), 'Mesajlar Okundu Olarak İşaretlenemedi', 'error', this.$t('ok'))
             resolve(false)
           })
@@ -493,7 +495,7 @@
       },
       fetchUserRecentMsg () {
         //TODO USER ID DEĞİŞECEK
-        this.loading = true
+        this.onOpenIndıcator()
         /*        let userMsgBoxData=[]
                 this.$store.dispatch(FETCH_USER_MSG_BOX, {
                   userid: 2
@@ -508,7 +510,8 @@
           userid: 2
         }).then((res) => {
           debugger
-          this.loading = false
+
+          this.onCloseIndıcator()
           let notInUsers = []
           if (res.data.length < 1) {
             notInUsers.push(2)
@@ -638,7 +641,7 @@
           console.log('store', this.$store.getters.getUserNotes)
         }).catch((err) => {
           debugger
-          this.loading = false
+          this.onCloseIndıcator()
           appPlugin.showalert(this.$t('warning'), this.$t('fetchError'), 'error', this.$t('ok'))
         })
       }
@@ -655,7 +658,6 @@
         defaultPreview: defaultImage,
         datas: [],
         userNotesList: [],
-        loading: false,
         selectedUser: {},
         selectedUserMsg: [],
         nextpageurl: '',

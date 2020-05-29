@@ -96,8 +96,10 @@
     VuetablePaginationInfo,
     appPlugin
   } from '@/Providers/defaultImports'
+  import loadingMixins from '@/mixins/loading'
 
   export default {
+    mixins: [loadingMixins],
     name: 'programs',
     components: {
       Multiselect,
@@ -138,7 +140,7 @@
           schoolid: this.selectedSchool.id,
           ptypeid: this.selectedProgramType.id
         }
-        this.loading = true
+        this.onOpenIndıcator()
         this.$store.dispatch('createSchoolProgramType', data).then((res) => {
           if (res && res.status == 200) {
             this.onResetData()
@@ -148,24 +150,25 @@
             appPlugin.showalert('Uyarı', 'İlgili Okula Ait Seçilen Program Türü Mevcut',
               'info', this.$t('ok'))
           }
-          this.loading = false
+          this.onCloseIndıcator()
         }).catch((err) => {
-          this.loading = false
+          this.onCloseIndıcator()
         })
       },
       onTouch () {
         this.isTouched = true
       },
       async fetchAllSchool () {
-        this.loading = true
+        this.onOpenIndıcator()
         await this.$store.dispatch('fetchAllSchools')
-        this.loading = false
+        this.onCloseIndıcator()
+
 
       },
       async fetchAllProgramTypes () {
-        this.loading = true
+        this.onOpenIndıcator()
         await this.$store.dispatch('fetchAllProgramTypes')
-        this.loading = false
+        this.onCloseIndıcator()
       }
     },
     computed: {
@@ -183,7 +186,6 @@
         isTouched: !false,
         selectedSchool: {},
         selectedProgramType: {},
-        loading: false
       }
     }
   }

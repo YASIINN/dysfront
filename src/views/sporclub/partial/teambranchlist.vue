@@ -81,15 +81,16 @@
     VuetablePaginationBootstrap,
     VuetablePaginationInfo
   } from '@/Providers/defaultImports'
+  import loadingMixins from '@/mixins/loading'
 
   export default {
+    mixins: [loadingMixins],
     name: 'teambranchlist',
     data () {
       return {
         currentData: [],
         moreParams: {},
         txt: '',
-        loading: false
       }
     },
     props: {
@@ -162,11 +163,12 @@
         }
       },
       exportallData () {
-        this.loading = true
+        this.onOpenIndıcator()
+
         this.$store
           .dispatch('fetchAllExportExcel', { id: this.$route.params.id })
           .then(res => {
-            this.loading = false
+            this.onCloseIndıcator()
             if (res.length > 0) {
               let data = res
               let keys = [
@@ -202,7 +204,7 @@
             }
           })
           .catch(err => {
-            this.loading = false
+            this.onCloseIndıcator()
           })
       },
       onChangePage (page) {
@@ -211,7 +213,7 @@
       onSuccess () {
       },
       onError (err) {
-        this.loading = false
+        this.onCloseIndıcator()
         appPlugin.showalert(this.$t('fetchError'), '', 'error', this.$t('ok'))
       },
       onPaginationData (paginationData) {
@@ -219,10 +221,10 @@
         this.$refs.paginationInfo.setPaginationData(paginationData)
       },
       onLoading () {
-        this.loading = true
+        this.onOpenIndıcator()
       },
       onLoaded () {
-        this.loading = false
+        this.onCloseIndıcator()
       },
       onSearchHandler (txt) {
         this.txt = txt
@@ -254,7 +256,7 @@
           showCancelButton: true
         }).then(res => {
           if (res.value) {
-            this.loading = true
+            this.onOpenIndıcator()
             this.$store
               .dispatch('deleteSCTeamBranch', {
                 deleted: item,
@@ -279,7 +281,7 @@
                   )
                 }
                 this.onRefreshTableContent()
-                this.loading = false
+                this.onCloseIndıcator()
               })
           }
         })

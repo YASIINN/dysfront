@@ -130,54 +130,25 @@
     </flex>
   </div>
 </template>
-
 <script>
-
   import {
-    SearchBox,
-    Loading,
-    FlexCard,
-    Flex,
-    VButton,
     required,
-    VInput,
-    VTooltipButton,
-    Vuetable,
     Swal,
-    VuetablePaginationBootstrap,
-    VuetablePaginationInfo,
     appPlugin
   } from '@/Providers/defaultImports'
-
+  import loadingMixins from '@/mixins/loading'
+  import vuetableMixins from '@/mixins/vuetable'
+  import defaulcomponentsMixins from '@/mixins/defaultcomponents'
   export default {
     name: 'index',
-    components: {
-      SearchBox,
-      FlexCard,
-      Flex,
-      Loading,
-      VInput,
-      VButton,
-      VTooltipButton,
-      Vuetable,
-      VuetablePaginationBootstrap,
-      VuetablePaginationInfo
-    },
+    mixins: [loadingMixins,vuetableMixins,defaulcomponentsMixins],
     data () {
       return {
-        currentData: [],
-        moreParams: {},
-        txt: '',
-        loading: false,
-        dataselected: false,
         clasesData: {
           name: '',
           code: ''
         },
-        selectedData: {}
       }
-    },
-    created () {
     },
     validations: {
       clasesData: {
@@ -191,7 +162,7 @@
     },
     methods: {
       exportallData () {
-        this.loading = true
+        this.onOpenIndıcator()
         this.$store.dispatch('fetchAllClases').then((res) => {
           if (res.data.length > 0) {
             let data = res.data
@@ -204,12 +175,12 @@
               this.$t('excelExportWarning'),
               'info',
               this.$t('ok')
-             )
+            )
 
           }
-          this.loading = false
+          this.onCloseIndıcator()
         }).catch((err) => {
-          this.loading = false
+          this.onCloseIndıcator()
         })
       },
       onFetchApi (apiUrl, httpOptions) {
@@ -234,31 +205,6 @@
           return data
         }
       },
-      onChangePage (page) {
-        this.$refs.vuetable.changePage(page)
-      },
-      onPaginationData (paginationData) {
-        this.$refs.pagination.setPaginationData(paginationData)
-        this.$refs.paginationInfo.setPaginationData(paginationData)
-      },
-      onLoading () {
-        this.loading = true
-      },
-      onLoaded () {
-        this.loading = false
-      },
-      onSuccess () {
-        /* succesFetchDataApi */
-      },
-      onError () {
-        this.loading = false
-        appPlugin.showalert(
-          this.$t('fetchError'),
-          '',
-          'error',
-          this.$t('ok')
-        )
-      },
       onUpdate () {
         if (this.$v.clasesData.code.$invalid) {
           appPlugin.showalert(
@@ -275,7 +221,7 @@
             this.$t('ok')
           )
         } else {
-          this.loading = true
+          this.onOpenIndıcator()
           this.$store.dispatch('updateClases', this.clasesData).then(res => {
             if (res.status) {
               if (res.status === 200) {
@@ -303,7 +249,7 @@
             }
             this.onRefreshTableContent()
             this.onResetData()
-            this.loading = false
+            this.onCloseIndıcator()
           })
         }
       },
@@ -334,7 +280,7 @@
           showCancelButton: true
         }).then(res => {
           if (res.value) {
-            this.loading = true
+            this.onOpenIndıcator()
             this.$store
               .dispatch('deleteClases', {
                 deleted: item,
@@ -359,17 +305,10 @@
                   )
                 }
                 this.onRefreshTableContent()
-                this.loading = false
+                this.onCloseIndıcator()
               })
           }
         })
-      },
-      onRefreshTableContent () {
-        this.$refs.vuetable.reload()
-      },
-      onCancel () {
-        this.dataselected = !this.dataselected
-        this.onResetData()
       },
       onCreateHandler () {
         if (this.$v.clasesData.code.$invalid) {
@@ -387,7 +326,7 @@
             this.$t('ok')
           )
         } else {
-          this.loading = true
+          this.onOpenIndıcator()
           let data = {
             created: this.clasesData,
             urlparse: appPlugin.urlParse(
@@ -418,7 +357,7 @@
               )
             }
             this.onRefreshTableContent()
-            this.loading = false
+            this.onCloseIndıcator()
           })
         }
       },
@@ -438,12 +377,6 @@
         }
 
       },
-      onSearchHandler (txt) {
-        this.txt = txt
-        this.$nextTick(function () {
-          this.$refs.vuetable.refresh()
-        })
-      }
     }
   }
 </script>

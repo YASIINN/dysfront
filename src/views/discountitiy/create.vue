@@ -215,6 +215,7 @@
   //normalde aktif olan kullanıcınn id si ile programlar çekilecek şimdilik test olarak
   //rast gele bir id ile getirilecek
   import _ from 'underscore'
+  import loadingMixins from '@/mixins/loading'
   import {
     SearchBox,
     Loading,
@@ -246,6 +247,7 @@
   import { FETCH_ALL_USER_APROGRAM_TODAY, FETCH_USER_PROGRAM_TODAY } from '../../store/modules/users/moduleNames'
 
   export default {
+    mixins: [loadingMixins],
     created () {
       //aktif tab okul
       this.getDType()
@@ -273,7 +275,7 @@
       },
       createADiscont () {
         let students = []
-        this.loading = true
+        this.onOpenIndıcator()
         if (this.$store.getters.getSelectedProgramStudents[0].filter != undefined) {
           debugger
           this.$store.getters.getSelectedProgramStudents.forEach((item) => {
@@ -285,13 +287,14 @@
           })
           debugger
           this.$store.dispatch(UPDATE_DISCONT, { studentList: students, type: 2 }).then((res) => {
-            this.loading = false
+
+            this.onCloseIndıcator()
             if (res.status == 200) {
               this.onReset()
               appPlugin.showalert('Bilgilendirme', 'Devamsızlık Kayıtları Başarıyla Eklendi', 'success', 'Tamam')
             }
           }).catch((err) => {
-            this.loading = false
+            this.onCloseIndıcator()
             appPlugin.showalert('Uyarı', 'Devamsızlık Kayıtları Eklenirken Hata Gerçekleşti Lütfen Daha Sonra Tekrar Deneyin', 'error', 'Tamam')
 
           })
@@ -309,7 +312,7 @@
           }).then((res) => {
             debugger
             if (res.status == 204) {
-              this.loading = false
+              this.onCloseIndıcator()
               Swal.fire({
                 title: 'Uyarı',
                 text: 'Bugün İçin Okullarda Devamsızlık Kaydı Atanmıştır. Yinede Devam Etmek İstiyor Musunuz ? Faaliyet Devamsızlığına Ait Bugünün Kayıtları Silinecektir.',
@@ -320,7 +323,7 @@
                 showCancelButton: true
               }).then((res) => {
                 if (res.value) {
-                  this.loading = true
+                  this.onOpenIndıcator()
                   this.$store.dispatch(DELETE_DISCONT, {
                     id: this.selectedAData.data.id,
                   }).then((res) => {
@@ -328,18 +331,18 @@
                       this.createADiscont()
                     }
                   }).catch((err) => {
-                    this.loading = false
+                    this.onCloseIndıcator()
                     appPlugin.showalert('Uyarı', 'Devamsızlık Kayıtları Silinirken Hata Gerçekleşti Lütfen Daha Sonra Tekrar Deneyin', 'error', 'Tamam')
                   })
                 }
               })
             } else if (res.status == 200) {
               this.onReset()
-              this.loading = false
+              this.onCloseIndıcator()
               appPlugin.showalert('Bilgilendirme', 'Devamsızlık Kayıtları Başarıyla Eklendi', 'success', 'Tamam')
             }
           }).catch((err) => {
-            this.loading = false
+            this.onCloseIndıcator()
             appPlugin.showalert('Uyarı', 'Devamsızlık Kayıtları Eklenirken Hata Gerçekleşti Lütfen Daha Sonra Tekrar Deneyin', 'error', 'Tamam')
 
           })
@@ -348,7 +351,7 @@
       createDiscont (e) {
         debugger
         let students = []
-        this.loading = true
+        this.onOpenIndıcator()
         if (this.$store.getters.getSelectedProgramStudents[0].filter != undefined) {
           //contentid
           this.$store.getters.getSelectedProgramStudents.forEach((item) => {
@@ -359,13 +362,13 @@
             })
           })
           this.$store.dispatch(UPDATE_DISCONT, { studentList: students, type: 1 }).then((res) => {
-            this.loading = false
+            this.onCloseIndıcator()
             if (res.status == 200) {
               this.onReset()
               appPlugin.showalert('Bilgilendirme', 'Devamsızlık Kayıtları Başarıyla Eklendi', 'success', 'Tamam')
             }
           }).catch((err) => {
-            this.loading = false
+            this.onCloseIndıcator()
             appPlugin.showalert('Uyarı', 'Devamsızlık Kayıtları Eklenirken Hata Gerçekleşti Lütfen Daha Sonra Tekrar Deneyin', 'error', 'Tamam')
 
           })
@@ -383,7 +386,7 @@
           }).then((res) => {
             debugger
             if (res.status == 204) {
-              this.loading = false
+              this.onCloseIndıcator()
               Swal.fire({
                 title: 'Uyarı',
                 text: 'Bugün İçin Faaliyetlerde Devamsızlık Kaydı Atanmıştır. Yinede Devam Etmek İstiyor Musunuz ? Faaliyet Devamsızlığına Ait Bugünün Kayıtları Silinecektir.',
@@ -394,7 +397,7 @@
                 showCancelButton: true
               }).then((res) => {
                 if (res.value) {
-                  this.loading = true
+                  this.onOpenIndıcator()
                   this.$store.dispatch(DELETE_DISCONT, {
                     id: this.selectedData.data.scoolprogramcontentid,
                   }).then((res) => {
@@ -402,18 +405,18 @@
                       this.createDiscont()
                     }
                   }).catch((err) => {
-                    this.loading = false
+                    this.onCloseIndıcator()
                     appPlugin.showalert('Uyarı', 'Devamsızlık Kayıtları Silinirken Hata Gerçekleşti Lütfen Daha Sonra Tekrar Deneyin', 'error', 'Tamam')
                   })
                 }
               })
             } else if (res.status == 200) {
               this.onReset()
-              this.loading = false
+              this.onCloseIndıcator()
               appPlugin.showalert('Bilgilendirme', 'Devamsızlık Kayıtları Başarıyla Eklendi', 'success', 'Tamam')
             }
           }).catch((err) => {
-            this.loading = false
+            this.onCloseIndıcator()
             appPlugin.showalert('Uyarı', 'Devamsızlık Kayıtları Eklenirken Hata Gerçekleşti Lütfen Daha Sonra Tekrar Deneyin', 'error', 'Tamam')
 
           })
@@ -421,20 +424,20 @@
 
       },
       getDType () {
-        this.loading = true
+        this.onOpenIndıcator()
         this.$store
           .dispatch(FETCH_DTYPE)
           .then(res => {
             console.log('res', res)
-            this.loading = false
+            this.onCloseIndıcator()
           })
           .catch(err => {
-            this.loading = false
+            this.onCloseIndıcator()
           })
       },
       showAStudentList (data) {
         debugger
-        this.loading = true
+        this.onOpenIndıcator()
         this.selectedAData.data = data
         this.selectedAData.index = 0
         this.$store.dispatch(FETCH_ASELECTEDPROGRAM_STUDENTS, {
@@ -443,10 +446,10 @@
           gradeid: data.sgrade.id,
           periodid: this.selectedAProgram.periodid
         }).then((res) => {
-          this.loading = false
+          this.onCloseIndıcator()
           debugger
         }).catch((err) => {
-          this.loading = false
+          this.onCloseIndıcator()
           appPlugin.showalert('Uyarı', 'Devamsızlık Kayıtları Getirilirken Hata Gerçekleşti Lütfen Daha Sonra Tekrar Deneyin', 'error', 'Tamam')
         })
       },
@@ -454,7 +457,7 @@
         debugger
         data.lesson = data.lessons.lName
         data.clases = data.classBranchName
-        this.loading = true
+        this.onOpenIndıcator()
         this.selectedData.data = data
         this.selectedData.index = 0
         this.$store
@@ -465,11 +468,11 @@
             branchid: data.branches_id
           })
           .then(res => {
-            this.loading = false
+            this.onCloseIndıcator()
             console.log('ba', this.$store.getters.getSelectedProgramStudents)
           })
           .catch(err => {
-            this.loading = false
+            this.onCloseIndıcator()
             appPlugin.showalert(
               'Seçilen Kayda Ait Öğrenci Listesi Getirilirken Hata Gerçekleşti',
               '',
@@ -529,7 +532,7 @@
       },
       async getHoursDate (id, data) {
         debugger
-        this.loading = true
+        this.onOpenIndıcator()
         let schooldays = await this.$store.dispatch('fetchSchoolDays', {
           urlparse: appPlugin.urlParse('school_p_type_id=' + id)
         })
@@ -568,35 +571,35 @@
 
         })
         this.userProgram = data
-        this.loading = false
+        this.onCloseIndıcator()
       },
       onChangeActivityProgram (data) {
         //look a for
         this.selectedAUserProgram = {}
         this.$store.commit(SET_SELECTEDPROGRAM_STUDENTS, [])
-        this.loading = true
+        this.onOpenIndıcator()
         let query = {
           userid: 2,
           programid: data.programid
         }
         this.$store.dispatch(FETCH_ALL_USER_APROGRAM_TODAY, query).then((res) => {
           this.userAProgram = res.data
-          this.loading = false
+          this.onCloseIndıcator()
         }).catch((err) => {
-          this.loading = false
+          this.onCloseIndıcator()
           appPlugin.showalert('Uyarı', 'Kayıtlar Getirilirken Hata Gerçekleşti Lütfen Daha Sonra Tekrar Deneyin', 'error', 'Tamam')
         })
       },
       getActivityProgram () {
-        this.loading = true
+        this.onOpenIndıcator()
         this.$store
           .dispatch('fetchAllUserActivityProgram', { id: 2 })
           .then(res => {
             debugger
-            this.loading = false
+            this.onCloseIndıcator()
           })
           .catch(err => {
-            this.loading = false
+            this.onCloseIndıcator()
           })
       },
       onChangeProgram (data) {
@@ -605,7 +608,7 @@
         debugger
         this.selectedProgram = {}
         this.$store.commit(SET_SELECTEDPROGRAM_STUDENTS, [])
-        this.loading = true
+        this.onOpenIndıcator()
         let query = {
           userid: 2,
           programid: data.programid
@@ -614,27 +617,27 @@
           .dispatch(FETCH_USER_PROGRAM_TODAY, query)
           .then(res => {
             console.log('gelen', res)
-            this.loading = false
+            this.onCloseIndıcator()
             this.getHoursDate(data.programid, res.data)
           })
           .catch(err => {
-            this.loading = false
+            this.onCloseIndıcator()
           })
       },
       onTouch () {
         this.ontouch = true
       },
       getUserProgram () {
-        this.loading = true
+        this.onOpenIndıcator()
         //TODO
         //user id geçilecek
         this.$store
           .dispatch('fetchAllUserSchoolProgram', { id: 2 })
           .then(res => {
-            this.loading = false
+            this.onCloseIndıcator()
           })
           .catch(err => {
-            this.loading = false
+            this.onCloseIndıcator()
           })
       }
     },
@@ -665,7 +668,6 @@
         daysData: [],
         ontouch: false,
 
-        loading: false
       }
     }
   }

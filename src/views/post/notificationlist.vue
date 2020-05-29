@@ -44,6 +44,8 @@
 </template>
 
 <script>
+  import loadingMixins from '@/mixins/loading'
+
   import {
     Loading,
     FlexCard,
@@ -59,6 +61,7 @@
   import defaultImage from '@/assets/img/defaultavatar.png'
 
   export default {
+    mixins: [loadingMixins],
     components: {
       FlexCard,
       Flex,
@@ -80,7 +83,7 @@
         })
       },
       loadMore () {
-        this.loading = true
+        this.onOpenIndıcator()
         let query = appPlugin.urlParse('from_user_id=' + 2)
         if (this.nexturl == this.lasturl) {
           debugger
@@ -99,16 +102,16 @@
               this.lasturl = res.last_page_url
               this.nexturl = res.next_page_url
             }
-            this.loading = false
+            this.onCloseIndıcator()
           }).catch((err) => {
             debugger
-            this.loading = false
+            this.onCloseIndıcator()
             appPlugin.showalert(this.$t('warning'),
               this.$t('fetchError'), 'error',
               this.$t('ok'))
           })
           this.nexturl = ''
-          this.loading = false
+          this.onCloseIndıcator()
         } else {
           debugger
           this.$store.dispatch(FETCH_NEXT_NOTIFICATION, {
@@ -125,22 +128,23 @@
               debugger
               this.nexturl = res.next_page_url
             }
-            this.loading = false
+            this.onCloseIndıcator()
           }).catch((err) => {
             debugger
-            this.loading = false
+            this.onCloseIndıcator()
             appPlugin.showalert(this.$t('warning'),
               this.$t('fetchError'), 'error',
               this.$t('ok'))
           })
-          this.loading = false
+          this.onCloseIndıcator()
         }
       },
       fetchAllPostNotification () {
-        this.loading = true
+        this.onOpenIndıcator()
         let query = appPlugin.urlParse('from_user_id=' + 2)
         this.$store.dispatch(FETCH_ALL_NOTIFICATION, { urlparse: query }).then((res) => {
-          this.loading = false
+          this.onCloseIndıcator()
+
           debugger
           console.log(res)
 
@@ -150,7 +154,7 @@
           this.lasturl = res.last_page_url
           this.notificationdata = res.data
         }).catch((err) => {
-          this.loading = false
+          this.onCloseIndıcator()
           appPlugin.showalert(this.$t('warning'), this.$t('getRecordErro'), 'error', this.$t('ok'))
 
         })
@@ -162,7 +166,6 @@
         nexturl: '',
         notificationdata: [],
         defaultPreview: defaultImage,
-        loading: false,
       }
     },
     name: 'notificationlist'

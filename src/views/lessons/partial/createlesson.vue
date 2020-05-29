@@ -215,36 +215,24 @@
 
 <script>
   import {
-    SearchBox,
     Loading,
     FlexCard,
     Flex,
     Vue,
-    VSelect,
-    VInputContainer,
     VButton,
     required,
     VInput,
-    VTooltipButton,
-    Vuetable,
     Swal,
-    VuetablePaginationBootstrap,
-    VuetablePaginationInfo,
     appPlugin
   } from '@/Providers/defaultImports'
+  import loadingMixins from '@/mixins/loading'
 
   export default {
+    mixins: [loadingMixins],
     components: {
-      VInputContainer,
-      VSelect,
-      SearchBox,
       Loading,
       VButton,
       VInput,
-      VTooltipButton,
-      Vuetable,
-      VuetablePaginationBootstrap,
-      VuetablePaginationInfo,
       Flex,
       FlexCard
     },
@@ -295,7 +283,6 @@
           }
         ],
         fields: [],
-        loading: false,
         dataselected: false,
         lessonData: {
           name: '',
@@ -332,7 +319,8 @@
       onUpdate () {
         let data
         let valid = false
-        this.loading = true
+
+        this.onOpenIndıcator()
         if (this.lessonData.type === 0) {
           if (this.$v.lessonData.code.$invalid) {
             valid = false
@@ -441,7 +429,7 @@
               )
             }
             this.onResetData()
-            this.loading = false
+            this.onCloseIndıcator()
           })
         }
       },
@@ -484,7 +472,7 @@
               this.$t('ok')
             )
           } else {
-            this.loading = true
+            this.onOpenIndıcator()
             let data = {
               created: this.lessonData,
               urlparse: appPlugin.urlParse(
@@ -524,7 +512,7 @@
                   this.$t('ok')
                 )
               }
-              this.loading = false
+              this.onCloseIndıcator()
             })
           }
         } else {
@@ -550,7 +538,7 @@
               this.$t('ok')
             )
           } else {
-            this.loading = true
+            this.onOpenIndıcator()
             let data = {
               created: this.lessonData,
               subData: this.subLessons,
@@ -591,7 +579,7 @@
                   this.$t('ok')
                 )
               }
-              this.loading = false
+              this.onCloseIndıcator()
             })
           }
         }
@@ -717,19 +705,6 @@
               )
             })
         }
-
-        /* axios
-               .put(
-                 '/updateSubLesson/' + this.subLessons[index].id,
-                 this.subLessons[index]
-               )
-               .then(res => {
-                 //
-               })
-               .catch(err => {
-
-               })*/
-        // dataupdate
       },
       removeSubLessons (index) {
         if (this.subLessons[index].id == undefined) {
@@ -750,7 +725,7 @@
               showCancelButton: true
             }).then(res => {
               if (res.value) {
-                this.loading = true
+                this.onOpenIndıcator()
                 this.$store
                   .dispatch('deleteSubLessons', { id: this.subLessons[index].id })
                   .then(res => {
@@ -773,7 +748,8 @@
                         this.$t('ok')
                       )
                     }
-                    this.loading = false
+
+                    this.onCloseIndıcator()
                   })
               }
             })

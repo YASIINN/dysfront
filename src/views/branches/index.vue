@@ -138,35 +138,17 @@
 
 <script>
   import {
-    SearchBox,
-    Loading,
-    FlexCard,
-    Flex,
-    VButton,
     required,
-    VInput,
-    VTooltipButton,
-    Vuetable,
     Swal,
-    VuetablePaginationBootstrap,
-    VuetablePaginationInfo,
     appPlugin
   } from '@/Providers/defaultImports'
+  import loadingMixins from '@/mixins/loading'
+  import vuetableMixins from '@/mixins/vuetable'
+  import defaulcomponentsMixins from '@/mixins/defaultcomponents'
 
   export default {
     name: 'index',
-    components: {
-      SearchBox,
-      VInput,
-      Loading,
-      Flex,
-      FlexCard,
-      VButton,
-      VTooltipButton,
-      Vuetable,
-      VuetablePaginationBootstrap,
-      VuetablePaginationInfo
-    },
+    mixins: [loadingMixins, vuetableMixins, defaulcomponentsMixins],
     validations: {
       branchData: {
         name: {
@@ -179,27 +161,19 @@
     },
     data () {
       return {
-        currentData: [],
-        moreParams: {},
-        txt: '',
-        loading: false,
-        dataselected: false,
         branchData: {
           name: '',
           code: ''
         },
-        selectedData: {}
       }
-    },
-    created () {
     },
     methods: {
       exportallData () {
-        this.loading = true
+        this.onOpenIndıcator()
         this.$store
           .dispatch('fetchAllBranches')
           .then(res => {
-            this.loading = false
+            this.onCloseIndıcator()
             if (res.data.length > 0) {
               let data = res.data
               let keys = ['bCode', 'bName']
@@ -215,27 +189,11 @@
             }
           })
           .catch(err => {
-            this.loading = false
+            this.onCloseIndıcator()
           })
       },
       onChangePage (page) {
         this.$refs.vuetable.changePage(page)
-      },
-      onPaginationData (paginationData) {
-        this.$refs.pagination.setPaginationData(paginationData)
-        this.$refs.paginationInfo.setPaginationData(paginationData)
-      },
-      onLoading () {
-        this.loading = true
-      },
-      onLoaded () {
-        this.loading = false
-      },
-      onSearchHandler (txt) {
-        this.txt = txt
-        this.$nextTick(function () {
-          this.$refs.vuetable.refresh()
-        })
       },
       onDelete (item, i) {
         Swal.fire({
@@ -247,7 +205,7 @@
           showCancelButton: true
         }).then(res => {
           if (res.value) {
-            this.loading = true
+            this.onOpenIndıcator()
             this.$store
               .dispatch('deleteBranches', {
                 deleted: item,
@@ -273,7 +231,7 @@
                 }
 
                 this.onRefreshTableContent()
-                this.loading = false
+                this.onCloseIndıcator()
               })
           }
         })
@@ -301,10 +259,6 @@
           code: ''
         }
       },
-      onError (err) {
-        this.loading = false
-        appPlugin.showalert(this.$t('fetchError'), '', 'error', this.$t('ok'))
-      },
       onUpdate () {
         if (this.$v.branchData.code.$invalid) {
           appPlugin.showalert(
@@ -321,7 +275,7 @@
             this.$t('ok')
           )
         } else {
-          this.loading = true
+          this.onOpenIndıcator()
           this.$store.dispatch('updateBranches', this.branchData).then(res => {
             if (res.status) {
               if (res.status === 200) {
@@ -348,18 +302,12 @@
               )
             }
             this.onRefreshTableContent()
-            this.loading = false
+            this.onCloseIndıcator()
             this.onResetData()
           })
         }
       },
-      onSuccess () {
-        /* succesFetchDataApi */
-      },
-      onCancel () {
-        this.dataselected = !this.dataselected
-        this.onResetData()
-      },
+
       onSelectData (data) {
         this.dataselected = true
         this.branchData = {
@@ -367,11 +315,6 @@
           code: data.bCode,
           id: data.id
         }
-      },
-      onAction (action, data, index) {
-      },
-      onRefreshTableContent () {
-        this.$refs.vuetable.reload()
       },
       onFetchApi (apiUrl, httpOptions) {
         var data
@@ -410,7 +353,7 @@
             this.$t('ok')
           )
         } else {
-          this.loading = true
+          this.onOpenIndıcator()
           let data = {
             created: this.branchData,
             urlparse: appPlugin.urlParse(
@@ -442,7 +385,7 @@
               )
             }
             this.onRefreshTableContent()
-            this.loading = false
+            this.onCloseIndıcator()
           })
         }
       }

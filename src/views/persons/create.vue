@@ -612,9 +612,10 @@
     VuetablePaginationInfo,
     appPlugin
   } from '@/Providers/defaultImports'
-
+  import loadingMixins from '@/mixins/loading'
   export default {
     name: 'createpersons',
+    mixins:[loadingMixins],
     computed: {
       //,TODO
       isInvalid () {
@@ -622,12 +623,12 @@
       }
     },
     created () {
-      this.loading = true
+      this.onOpenIndıcator()
       this.$store.dispatch('fetchAllTitles')
       this.$store.dispatch('fetchAllProvince')
       this.$store.dispatch('fetchAllUnits')
       this.fetchScoolData()
-      this.loading = false
+      this.onCloseIndıcator()
     },
     methods: {
       onChangeType (item, cls, clsIndex) {
@@ -638,7 +639,7 @@
         this.showAlert = false
       },
       fetchScoolData () {
-        this.loading = true
+        this.onOpenIndıcator()
         this.$store.dispatch('fetchAllSchools').then(res => {
         })
         this.$store.dispatch('fetchAllSchoolAllClasesPivot').then(res => {
@@ -647,7 +648,7 @@
             this.groupedSchools = groupedSchool
           }
         })
-        this.loading = false
+        this.onCloseIndıcator()
       },
 
       getActiveTabs (data) {
@@ -666,15 +667,16 @@
         }
       },
       fetchSporClubData () {
-        this.loading = true
+
+        this.onOpenIndıcator()
         this.$store.dispatch('fetchAllSporClubs')
 
-        this.loading = false
+        this.onCloseIndıcator()
       },
       fetchUserActivity () {
-        this.loading = true
+        this.onOpenIndıcator()
         this.$store.dispatch('fetchUserRelationActivity')
-        this.loading = false
+        this.onCloseIndıcator()
       },
 
       personCreteControl () {
@@ -757,7 +759,7 @@
           let data
           let query
           let orquery
-          this.loading = true
+          this.onOpenIndıcator()
           if (this.personData.file != '') {
             let formData = new FormData()
             let birthDay = this.personData.birthday
@@ -815,7 +817,7 @@
                                       if (res.status) {
                                         if (res.status == 200) {
                                           this.user = user
-                                          this.loading = false
+                                          this.onCloseIndıcator()
                                           this.personData = {
                                             notificationType: {
                                               sms: false,
@@ -862,7 +864,7 @@
                                             'Tamam'
                                           )
                                         } else {
-                                          this.loading = false
+                                          this.onCloseIndıcator()
                                           appPlugin.showalert(
                                             'Personel Parolası Oluşturulurken  Hata Gerçekleşti ',
                                             '',
@@ -871,7 +873,7 @@
                                           )
                                         }
                                       } else {
-                                        this.loading = false
+                                        this.onCloseIndıcator()
                                         appPlugin.showalert(
                                           'Personel Parolası Oluşturulurken  Hata Gerçekleşti ',
                                           '',
@@ -881,7 +883,7 @@
                                       }
                                     })
                                 } else {
-                                  this.loading = false
+                                  this.onCloseIndıcator()
                                   appPlugin.showalert(
                                     'Personel Eklenirken Hata Gerçekleşti ',
                                     '',
@@ -891,7 +893,7 @@
                                 }
                               })
                               .catch(err => {
-                                this.loading = false
+                                this.onCloseIndıcator()
                                 appPlugin.showalert(
                                   'Personel Eklenirken Hata Gerçekleşti ',
                                   '',
@@ -900,7 +902,7 @@
                                 )
                               })
                           } else if (res.status == 204) {
-                            this.loading = false
+                            this.onCloseIndıcator()
                             appPlugin.showalert(
                               'Uyarı',
                               'Email Adresi,Telefon Numarası Veya TC Numarası Daha Önce Kullanıldı',
@@ -909,7 +911,7 @@
                             )
                           }
                         } else {
-                          this.loading = false
+                          this.onCloseIndıcator()
                           appPlugin.showalert(
                             'Personel Eklenirken Hata Gerçekleşti ',
                             '',
@@ -919,7 +921,7 @@
                         }
                       })
                       .catch(err => {
-                        this.loading = false
+                        this.onCloseIndıcator()
                         appPlugin.showalert(
                           'Personel Eklenirken Hata Gerçekleşti ',
                           '',
@@ -934,10 +936,10 @@
                       'error',
                       'Tamam'
                     )
-                    this.loading = false
+                    this.onCloseIndıcator()
                   }
                 } else {
-                  this.loading = false
+                  this.onCloseIndıcator()
                   appPlugin.showalert(
                     'Personel Resim Ekleme İşlemi Başarısız',
                     '',
@@ -947,7 +949,7 @@
                 }
               })
               .catch(err => {
-                this.loading = false
+                this.onCloseIndıcator()
                 appPlugin.showalert(
                   'Personel Resim Ekleme İşlemi Başarısız',
                   '',
@@ -1020,7 +1022,7 @@
                               if (res.status) {
                                 if (res.status == 200) {
                                   this.user = user
-                                  this.loading = false
+                                  this.onCloseIndıcator()
                                   this.personData = {
                                     notificationType: {
                                       sms: false,
@@ -1071,7 +1073,7 @@
                                     'Tamam'
                                   )
                                 } else {
-                                  this.loading = false
+                                  this.onCloseIndıcator()
                                   appPlugin.showalert(
                                     'Personel Parolası Oluşturulurken  Hata Gerçekleşti ',
                                     '',
@@ -1080,7 +1082,7 @@
                                   )
                                 }
                               } else {
-                                this.loading = false
+                                this.onCloseIndıcator()
                                 appPlugin.showalert(
                                   'Personel Parolası Oluşturulurken  Hata Gerçekleşti ',
                                   '',
@@ -1090,7 +1092,7 @@
                               }
                             })
                         } else {
-                          this.loading = false
+                          this.onCloseIndıcator()
                           appPlugin.showalert(
                             'Personel Eklenirken Hata Gerçekleşti ',
                             '',
@@ -1100,7 +1102,7 @@
                         }
                       })
                       .catch(err => {
-                        this.loading = false
+                        this.onCloseIndıcator()
                         appPlugin.showalert(
                           'Personel Eklenirken Hata Gerçekleşti ',
                           '',
@@ -1109,7 +1111,7 @@
                         )
                       })
                   } else if (res.status == 204) {
-                    this.loading = false
+                    this.onCloseIndıcator()
                     appPlugin.showalert(
                       'Uyarı',
                       'Email Adresi,Telefon Numarası Veya TC Numarası Daha Önce Kullanıldı',
@@ -1118,7 +1120,7 @@
                     )
                   }
                 } else {
-                  this.loading = false
+                  this.onCloseIndıcator()
                   appPlugin.showalert(
                     'Personel Eklenirken Hata Gerçekleşti ',
                     '',
@@ -1128,7 +1130,7 @@
                 }
               })
               .catch(err => {
-                this.loading = false
+                this.onCloseIndıcator()
                 appPlugin.showalert(
                   'Personel Eklenirken Hata Gerçekleşti ',
                   '',
@@ -1154,7 +1156,7 @@
         //TODO
         switch (type) {
           case 'school':
-            this.loading = true
+            this.onOpenIndıcator()
             this.$store.dispatch('fetchAllSchools').then(res => {
             })
             this.$store.dispatch('fetchAllSchoolAllClasesPivot').then(res => {
@@ -1163,7 +1165,7 @@
                 this.groupedSchools = groupedSchool
               }
             })
-            this.loading = false
+            this.onCloseIndıcator()
             break
 
           case 'sporclub':
@@ -1272,7 +1274,6 @@
         showAlert: false,
         user: {},
         isTouched: false,
-        loading: false,
         createPerson: true,
         groupedSchools: {},
         defaultPreview: defaultImage,

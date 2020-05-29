@@ -261,8 +261,10 @@
   import { FETCH_DTYPE } from '../../store/modules/dtype/moduleNames'
   import { FETCH_STUDENT_FOR_D, FETCH_STUDENTFOR_DISCONT_A } from '../../store/modules/discontinuity/moduleNames'
   import { FETCH_STUDENTS_D } from '@/store/modules/discontinuity/moduleNames'
+  import loadingMixins from '@/mixins/loading'
 
   export default {
+    mixins: [loadingMixins],
     created () {
       //TODO USER ID
       this.fetchUserStudent()
@@ -276,7 +278,6 @@
         startdate: date1,
         enddate: date2,
         selectedStudent: {},
-        loading: false
       }
     },
     methods: {
@@ -301,11 +302,11 @@
       fetchDType () {
         this.$store.dispatch(FETCH_DTYPE).then((res) => {
           debugger
-          this.loading = false
+          this.onCloseIndıcator()
           res.data.unshift({ id: 0, dtName: 'Tümü' })
           this.dtypes = res.data
         }).catch((err) => {
-          this.loading = false
+          this.onCloseIndıcator()
 
           appPlugin.showalert(this.$t('warning'), this.$t('getRecordErro', 'eror', this.$t('ok')))
 
@@ -338,10 +339,10 @@
             let storageData = JSON.parse(JSON.stringify(res.data))
             localStorage.setItem('sData', JSON.stringify(storageData))
             this.sfordactivity = res.data
-            this.loading = false
+            this.onCloseIndıcator()
           }).catch((err) => {
             appPlugin.showalert(this.$t('warning'), this.$t('getRecordErro'), 'error', this.$t('ok'))
-            this.loading = false
+            this.onCloseIndıcator()
           })
         }
       },
@@ -394,7 +395,8 @@
           appPlugin.showalert(this.$t('warning'), this.$t('selectstudent'), 'warning', this.$t('ok'))
         } else {
           debugger
-          this.loading = true
+          this.onOpenIndıcator()
+
           this.$store.dispatch(FETCH_STUDENT_FOR_D, {
             studentid: this.selectedStudent.id,
             sdate: moment(this.startdate).format('YYYY-MM-DD'),
@@ -412,15 +414,15 @@
             let storageData = JSON.parse(JSON.stringify(res.data))
             localStorage.setItem('sData', JSON.stringify(storageData))
             this.sdstudentlist = res.data
-            this.loading = false
+            this.onCloseIndıcator()
           }).catch((err) => {
             appPlugin.showalert(this.$t('warning'), this.$t('getRecordErro'), 'error', this.$t('ok'))
-            this.loading = false
+            this.onCloseIndıcator()
           })
         }
       },
       fetchUserStudent () {
-        this.loading = true
+        this.onOpenIndıcator()
         this.$store.dispatch(FETCH_USER_STUDENTS, {
           userid: 2
         }).then((res) => {
@@ -428,9 +430,9 @@
             this.selectedStudent = res.data[0]
             this.fetchDiscont()
           }
-          this.loading = false
+          this.onCloseIndıcator()
         }).catch((err) => {
-          this.loading = false
+          this.onCloseIndıcator()
           appPlugin.showalert(this.$t('warning'), 'Öğrenci Bilgileri Getirilirken Hata Gerçekleşti Lütfen Daha Sonra Tekrar Deneyin', 'error', this.$t('ok'))
         })
       }

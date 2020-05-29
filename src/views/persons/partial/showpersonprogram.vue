@@ -164,10 +164,10 @@
   import { FETCH_SCHOOL_DAYS } from '../../../store/modules/schooldays/moduleNames'
   import { FETCH_SCHOOL_HOURS } from '../../../store/modules/schoolhours/moduleNames'
   import { FETCH_USER_SCHOOL_PROGRAM } from '../../../store/modules/schoolprogram/moduleNames'
+  import loadingMixins from '@/mixins/loading'
 
   export default {
-    created () {
-    },
+    mixins: [loadingMixins],
     props: {
       header: {}
     },
@@ -198,7 +198,6 @@
         daysData: [],
         ontouch: false,
         selectedProgram: {},
-        loading: false
       }
     },
     methods: {
@@ -398,41 +397,41 @@
       },
       getUserSporClubProgram () {
         //TODO BAK
-        this.loading = true
+        this.onOpenIndıcator()
         this.$store
           .dispatch(FETCH_USER_SPORCLUB_PROGRAM, { id: this.$route.params.id })
           .then(res => {
-            this.loading = false
+            this.onCloseIndıcator()
           })
           .catch(err => {
-            this.loading = false
+            this.onCloseIndıcator()
             appPlugin.showalert(this.$t('warning'), this.$t('fetchError'), 'error', this.$t('ok'))
 
           })
       },
       getUserActivityProgram () {
         //bura
-        this.loading = true
+        this.onOpenIndıcator()
         this.$store
           .dispatch(FETCH_ALL_USER_APROGRAM, { id: this.$route.params.id })
           .then(res => {
-            this.loading = false
+            this.onCloseIndıcator()
           })
           .catch(err => {
-            this.loading = false
+            this.onCloseIndıcator()
             appPlugin.showalert(this.$t('warning'), this.$t('fetchError'), 'error', this.$t('ok'))
 
           })
       },
       getUserProgram () {
-        this.loading = true
+        this.onOpenIndıcator()
         this.$store
           .dispatch(FETCH_ALL_USER_PROGRAM, { id: this.$route.params.id })
           .then(res => {
-            this.loading = false
+            this.onCloseIndıcator()
           })
           .catch(err => {
-            this.loading = false
+            this.onCloseIndıcator()
             appPlugin.showalert(this.$t('warning'), this.$t('fetchError'), 'error', this.$t('ok'))
 
           })
@@ -441,14 +440,14 @@
         this.ontouch = true
       },
       async getSporClubHoursDate (id) {
-        this.loading = true
+        this.onOpenIndıcator()
         await this.$store.dispatch('fetchClubPHours', { where: 'club_p_type_id', id: id })
         await this.$store.dispatch('fetchClubPDays', { where: 'club_p_type_id', id: id })
 
         let sporclubdays = this.$store.getters.clubpdays
         let sporclubhours = this.$store.getters.clubphours
         console.log(sporclubdays)
-        this.loading = false
+        this.onCloseIndıcator()
         sporclubdays.forEach(item => {
           item.sdName = item.adname
           item.hours = []
@@ -467,7 +466,7 @@
         this.daysData = sporclubdays
       },
       async getActivityHoursDate (id) {
-        this.loading = true
+        this.onOpenIndıcator()
         await this.$store.dispatch('fetchActivityPDays', {
           where: 'activity_p_type_id',
           id: id
@@ -479,7 +478,7 @@
 
         let activitydays = this.$store.getters.activitypdays
         let activityhour = this.$store.getters.activityphours
-        this.loading = false
+        this.onCloseIndıcator()
         activitydays.forEach(item => {
           item.sdName = item.adname
           item.hours = []
@@ -498,14 +497,14 @@
         this.daysData = activitydays
       },
       async getHoursDate (id) {
-        this.loading = true
+        this.onOpenIndıcator()
         let schooldays = await this.$store.dispatch(FETCH_SCHOOL_DAYS, {
           urlparse: appPlugin.urlParse('school_p_type_id=' + id)
         })
         let schoolhour = await this.$store.dispatch(FETCH_SCHOOL_HOURS, {
           urlparse: appPlugin.urlParse('school_p_type_id=' + id)
         })
-        this.loading = false
+        this.onCloseIndıcator()
         schooldays.forEach(item => {
           item.hours = []
           schoolhour.forEach(hour => {
@@ -524,7 +523,7 @@
       },
       onChangeProgram (data) {
         debugger
-        this.loading = true
+        this.onOpenIndıcator()
         if (this.selectedType.id == 1) {
           let query = {
             userid: this.$route.params.id,
@@ -534,10 +533,10 @@
           this.$store
             .dispatch(FETCH_USER_SCHOOL_PROGRAM, query)
             .then(res => {
-              this.loading = false
+              this.onCloseIndıcator()
             })
             .catch(err => {
-              this.loading = false
+              this.onCloseIndıcator()
             })
         } else if (this.selectedType.id == 2) {
           this.getActivityHoursDate(data.programid)
@@ -548,10 +547,10 @@
           this.$store
             .dispatch(FETCH_ACTIVITY_PROGRAM, query)
             .then(res => {
-              this.loading = false
+              this.onCloseIndıcator()
             })
             .catch(err => {
-              this.loading = false
+              this.onCloseIndıcator()
             })
         } else if (this.selectedType.id == 3) {
           this.getSporClubHoursDate(data.programid)
@@ -560,11 +559,11 @@
             programid: data.programid
           }
           this.$store.dispatch('fetchUserSporClubProgramD', query).then((res) => {
-            this.loading = false
+            this.onCloseIndıcator()
             console.log('response', res)
 
           }).catch((err) => {
-            this.loading = false
+            this.onCloseIndıcator()
             appPlugin.showalert(this.$t('warning'), this.$t('fetchError'), 'error', this.$t('ok'))
           })
         }

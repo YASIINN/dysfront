@@ -45,7 +45,7 @@
         </div>
       </div>
     </flex-card>
-    <flex-card column="col-md-12 col-sm-12 col-lg-12 mt-5" v-if="!isInvalid" >
+    <flex-card column="col-md-12 col-sm-12 col-lg-12 mt-5" v-if="!isInvalid">
       <div class="card-body">
         <div>
           <div class="row">
@@ -117,14 +117,14 @@
       </div>
     </flex-card>
 
-      <!--   <p class="text text-center" v-if="$store.getters.getUserPost.length!=0"> Toplam Paylaşım :
-           {{$store.getters.getUserPost.length}}
-         </p>
-         <p class="text text-center" v-if="$store.getters.getUserPost.length==0">
-           Henüz Paylaşımınız Yok
-           <router-link tag="a" to="/social">Buraya</router-link>
-           Tıklayarak Paylaşım Oluşturabilirsiniz.
-         </p>-->
+    <!--   <p class="text text-center" v-if="$store.getters.getUserPost.length!=0"> Toplam Paylaşım :
+         {{$store.getters.getUserPost.length}}
+       </p>
+       <p class="text text-center" v-if="$store.getters.getUserPost.length==0">
+         Henüz Paylaşımınız Yok
+         <router-link tag="a" to="/social">Buraya</router-link>
+         Tıklayarak Paylaşım Oluşturabilirsiniz.
+       </p>-->
 
   </div>
 </template>
@@ -152,9 +152,11 @@
   import { FETCH_USER_SCHOOL_PROGRAM } from '../../store/modules/schoolprogram/moduleNames'
   import { FETCH_SCHOOL_DAYS } from '../../store/modules/schooldays/moduleNames'
   import { FETCH_SCHOOL_HOURS } from '../../store/modules/schoolhours/moduleNames'
+  import loadingMixins from '@/mixins/loading'
 
   export default {
     name: 'teachertimetable',
+    mixins: [loadingMixins],
     components: {
       FlexCard,
       Flex,
@@ -163,9 +165,6 @@
       VButton,
       Datetime,
       Multiselect
-
-    },
-    created () {
 
     },
     computed: {
@@ -177,7 +176,7 @@
       onChangeProgram (data) {
         debugger
         //TODO LOGIN USERID
-        this.loading = true
+        this.onOpenIndıcator()
         if (this.currentTabItem.id == 0) {
           let query = {
             userid: 2,
@@ -187,10 +186,10 @@
           this.$store
             .dispatch(FETCH_USER_SCHOOL_PROGRAM, query)
             .then(res => {
-              this.loading = false
+              this.onCloseIndıcator()
             })
             .catch(err => {
-              this.loading = false
+              this.onCloseIndıcator()
             })
         } else if (this.currentTabItem.id == 1) {
           this.getActivityHoursDate(data.programid)
@@ -201,10 +200,10 @@
           this.$store
             .dispatch(FETCH_ACTIVITY_PROGRAM, query)
             .then(res => {
-              this.loading = false
+              this.onCloseIndıcator()
             })
             .catch(err => {
-              this.loading = false
+              this.onCloseIndıcator()
             })
         } else if (this.currentTabItem.id == 2) {
           this.getSporClubHoursDate(data.programid)
@@ -213,24 +212,24 @@
             programid: data.programid
           }
           this.$store.dispatch('fetchUserSporClubProgramD', query).then((res) => {
-            this.loading = false
+            this.onCloseIndıcator()
             console.log('response', res)
 
           }).catch((err) => {
-            this.loading = false
+            this.onCloseIndıcator()
             appPlugin.showalert(this.$t('warning'), this.$t('fetchError'), 'error', this.$t('ok'))
           })
         }
       },
       async getSporClubHoursDate (id) {
-        this.loading = true
+        this.onOpenIndıcator()
         await this.$store.dispatch('fetchClubPHours', { where: 'club_p_type_id', id: id })
         await this.$store.dispatch('fetchClubPDays', { where: 'club_p_type_id', id: id })
 
         let sporclubdays = this.$store.getters.clubpdays
         let sporclubhours = this.$store.getters.clubphours
         console.log(sporclubdays)
-        this.loading = false
+        this.onCloseIndıcator()
         sporclubdays.forEach(item => {
           item.sdName = item.adname
           item.hours = []
@@ -249,7 +248,7 @@
         this.daysData = sporclubdays
       },
       async getActivityHoursDate (id) {
-        this.loading = true
+        this.onOpenIndıcator()
         await this.$store.dispatch('fetchActivityPDays', {
           where: 'activity_p_type_id',
           id: id
@@ -261,7 +260,7 @@
 
         let activitydays = this.$store.getters.activitypdays
         let activityhour = this.$store.getters.activityphours
-        this.loading = false
+        this.onCloseIndıcator()
         activitydays.forEach(item => {
           item.sdName = item.adname
           item.hours = []
@@ -280,14 +279,14 @@
         this.daysData = activitydays
       },
       async getHoursDate (id) {
-        this.loading = true
+        this.onOpenIndıcator()
         let schooldays = await this.$store.dispatch(FETCH_SCHOOL_DAYS, {
           urlparse: appPlugin.urlParse('school_p_type_id=' + id)
         })
         let schoolhour = await this.$store.dispatch(FETCH_SCHOOL_HOURS, {
           urlparse: appPlugin.urlParse('school_p_type_id=' + id)
         })
-        this.loading = false
+        this.onCloseIndıcator()
         schooldays.forEach(item => {
           item.hours = []
           schoolhour.forEach(hour => {
@@ -512,16 +511,16 @@
         //TODO BAK
         //TODO USER ID LOGIN
 
-        this.loading = true
-        this.$store.commit(SET_USER_PROGRAMS_ALL,[])
+        this.onOpenIndıcator()
+        this.$store.commit(SET_USER_PROGRAMS_ALL, [])
 
         this.$store
           .dispatch(FETCH_USER_SPORCLUB_PROGRAM, { id: 2 })
           .then(res => {
-            this.loading = false
+            this.onCloseIndıcator()
           })
           .catch(err => {
-            this.loading = false
+            this.onCloseIndıcator()
             appPlugin.showalert(this.$t('warning'), this.$t('fetchError'), 'error', this.$t('ok'))
 
           })
@@ -530,31 +529,32 @@
         //bura
         //TODO USER ID LOGIN
 
-        this.loading = true
-        this.$store.commit(SET_USER_PROGRAMS_ALL,[])
+        this.onOpenIndıcator()
+        this.$store.commit(SET_USER_PROGRAMS_ALL, [])
 
         this.$store
           .dispatch(FETCH_ALL_USER_APROGRAM, { id: 2 })
           .then(res => {
-            this.loading = false
+            this.onCloseIndıcator()
           })
           .catch(err => {
-            this.loading = false
+            this.onCloseIndıcator()
             appPlugin.showalert(this.$t('warning'), this.$t('fetchError'), 'error', this.$t('ok'))
 
           })
       },
       getUserProgram () {
         //TODO USER ID LOGIN
-        this.loading = true
-        this.$store.commit(SET_USER_PROGRAMS_ALL,[])
+        this.onOpenIndıcator()
+        this.$store.commit(SET_USER_PROGRAMS_ALL, [])
         this.$store
           .dispatch(FETCH_ALL_USER_PROGRAM, { id: 2 })
           .then(res => {
-            this.loading = false
+
+            this.onCloseIndıcator()
           })
           .catch(err => {
-            this.loading = false
+            this.onCloseIndıcator()
             appPlugin.showalert(this.$t('warning'), this.$t('fetchError'), 'error', this.$t('ok'))
 
           })

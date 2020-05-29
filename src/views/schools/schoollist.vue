@@ -182,46 +182,26 @@
 
 <script>
 
-
   import {
-    SearchBox,
-    Loading,
-    VSelect,
-    AlertBox,
-    FlexCard,
-    Flex,
-    VButton,
-    required,
-    VInput,
-    VTooltipButton,
-    Vuetable,
     Swal,
-    VuetablePaginationBootstrap,
-    VuetablePaginationInfo,
-    appPlugin
+    appPlugin,
+    required,
+    AlertBox,
   } from '@/Providers/defaultImports'
-
+  import loadingMixins from '@/mixins/loading'
+  import vuetableMixins from '@/mixins/vuetable'
+  import defaulcomponentsMixins from '@/mixins/defaultcomponents'
   export default {
     name: 'schollist',
     components: {
-      Flex,
       AlertBox,
-      FlexCard,
-      SearchBox,
-      Loading,
-      VSelect,
-      VInput,
-      VButton,
-      VTooltipButton,
-      Vuetable,
-      VuetablePaginationBootstrap,
-      VuetablePaginationInfo
     },
-    created () {
-      this.loading = true
-      this.$store.dispatch('fetchAllCompanies').then(res => {
-        this.loading = false
 
+    mixins: [loadingMixins,defaulcomponentsMixins,vuetableMixins],
+    created () {
+      this.onOpenIndıcator()
+      this.$store.dispatch('fetchAllCompanies').then(res => {
+        this.onCloseIndıcator()
         if (res.data.length < 1) {
           this.showAlert = true
         }
@@ -229,7 +209,7 @@
     },
     methods: {
       exportallData () {
-        this.loading = true
+        this.onOpenIndıcator()
         this.$store.dispatch('fetchAllSchools').then((res) => {
           if (res.length > 0) {
             res.forEach((item) => {
@@ -239,7 +219,7 @@
             let keys = ['sCode', 'sName', 'cName']
             const header = ['Okul Kodu', 'Okul Adı', 'Firma Adı']
             appPlugin.exportExcelTable(data, 'Okullar', 14, keys, header)
-            this.loading = false
+            this.onCloseIndıcator()
           } else {
             appPlugin.showalert(
               this.$t('warning'),
@@ -249,7 +229,7 @@
             )
           }
         }).catch((err) => {
-          this.loading = false
+          this.onCloseIndıcator()
         })
       },
       onUpdate () {
@@ -275,7 +255,7 @@
             this.$t('ok')
           )
         } else {
-          this.loading = true
+          this.onOpenIndıcator()
           let data = {
             updated: this.schoolData,
             urlparse: appPlugin.urlParse(
@@ -313,7 +293,7 @@
               )
             }
             this.onRefreshTableContent()
-            this.loading = false
+            this.onCloseIndıcator()
             this.onResetData()
           })
         }
@@ -342,7 +322,7 @@
           showCancelButton: true
         }).then(res => {
           if (res.value) {
-            this.loading = true
+            this.onOpenIndıcator()
             this.$store
               .dispatch('deleteSchools', {
                 deleted: item,
@@ -368,7 +348,7 @@
                   )
                 }
                 this.onRefreshTableContent()
-                this.loading = false
+                this.onCloseIndıcator()
               })
           }
         })
@@ -388,31 +368,6 @@
           )
         }
       },
-      onSearchHandler (txt) {
-        this.txt = txt
-        this.$nextTick(function () {
-          this.$refs.vuetable.refresh()
-        })
-      },
-      onChangePage (page) {
-        this.$refs.vuetable.changePage(page)
-      },
-      onPaginationData (paginationData) {
-        this.$refs.pagination.setPaginationData(paginationData)
-        this.$refs.paginationInfo.setPaginationData(paginationData)
-      },
-      onLoading () {
-        this.loading = true
-      },
-      onLoaded () {
-        this.loading = false
-      },
-      onRefreshTableContent () {
-        this.$refs.vuetable.reload()
-      },
-      onSuccess () {
-        /* succesFetchDataApi */
-      },
       onResetData () {
         this.dataselected = false
         this.selectedData = {}
@@ -421,19 +376,6 @@
           code: '',
           company: ''
         }
-      },
-      onError () {
-        this.loading = false
-        appPlugin.showalert(
-          this.$t('getRecordErro'),
-          '',
-          'error',
-          this.$t('ok')
-        )
-      },
-      onCancel () {
-        this.dataselected = !this.dataselected
-        this.onResetData()
       },
       onCreateHandler () {
         if (this.$v.schoolData.company.$invalid) {
@@ -458,7 +400,7 @@
             this.$t('ok')
           )
         } else {
-          this.loading = true
+          this.onOpenIndıcator()
           let data = {
             created: this.schoolData,
             urlparse: appPlugin.urlParse(
@@ -493,7 +435,7 @@
               )
             }
             this.onRefreshTableContent()
-            this.loading = false
+            this.onOpenIndıcator()
           })
         }
       },
@@ -531,7 +473,6 @@
       return {
         showAlert: false,
         moreParams: {},
-        loading: false,
         selectedData: {},
         currentData: [],
         txt: '',

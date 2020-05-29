@@ -1,6 +1,6 @@
 <template>
   <flex column="col-md-12 col-sm-12 col-lg-12">
-    <Loading v-if="loading" />
+    <Loading v-if="loading"/>
     <div class="card">
       <div class="card-header border-0">
         <div class="row">
@@ -75,243 +75,189 @@
   </flex>
 </template>
 <script>
-import {
-  SearchBox,
-  Loading,
-  FlexCard,
-  Flex,
-  VSelect,
-  VInputContainer,
-  VButton,
-  VInput,
-  VTooltipButton,
-  Vuetable,
-  Swal,
-  VuetablePaginationBootstrap,
-  VuetablePaginationInfo,
-  appPlugin
-} from "@/Providers/defaultImports";
+  import {
+    Swal,
+    appPlugin
+  } from '@/Providers/defaultImports'
+  import loadingMixins from '@/mixins/loading'
+  import vuetableMixins from '@/mixins/vuetable'
+  import defaulcomponentsMixins from '@/mixins/defaultcomponents'
 
-export default {
-  name: "lessonlisttable",
-  watch: {
-    onreset: function(val) {
-      if (val == true) {
-        this.onRefreshTableContent();
-        this.$emit("onRefresh", true);
-      }
-    }
-  },
-  props: {
-    onreset: {}
-  },
-  data() {
-    return {
-      moreParams: {},
-      filterData: [
-        {
-          name: "Tümü",
-          id: 2
-        },
-        {
-          name: "Normal",
-          id: 0
-        },
-        {
-          name: "Seçmeli",
-          id: 1
+  export default {
+    name: 'lessonlisttable',
+    mixins: [loadingMixins, defaulcomponentsMixins, vuetableMixins],
+    watch: {
+      onreset: function (val) {
+        if (val == true) {
+          this.onRefreshTableContent()
+          this.$emit('onRefresh', true)
         }
-      ],
-      currentData: [],
-      txt: "",
-      loading: false,
-      selectedLessonFilter: 2
-    };
-  },
-  methods: {
-    onSelectData(data) {
-      this.$emit("onSelectData", data);
+      }
     },
-
-    onFilterChange() {
-      this.$nextTick(function() {
-        this.$refs.vuetable.refresh();
-      });
+    props: {
+      onreset: {}
     },
-    exportallData() {
-      this.loading = true;
-      this.$store
-        .dispatch("fetchAllLessons")
-        .then(res => {
-          if (res.data.length > 0) {
-            res.data.forEach(item => {
-              if (item.type == 0) {
-                item.type = "Normal";
-              } else {
-                item.type = "Seçmeli";
-              }
-            });
-            const data = res.data;
-            const keys = ["lName", "lCode", "type"];
-            const header = ["Ders Kodu", "Ders Adı", "Ders Türü"];
-            appPlugin.exportExcelTable(data, "Dersler", 14, keys, header);
-          } else {
-            appPlugin.showalert(
-              this.$t('warning'),
-              this.$t('excelExportWarning'),
-              'info',
-              this.$t('ok')
-            )
-
+    data () {
+      return {
+        filterData: [
+          {
+            name: 'Tümü',
+            id: 2
+          },
+          {
+            name: 'Normal',
+            id: 0
+          },
+          {
+            name: 'Seçmeli',
+            id: 1
           }
-          this.loading = false;
+        ],
+        selectedLessonFilter: 2
+      }
+    },
+    methods: {
+      onSelectData (data) {
+        this.$emit('onSelectData', data)
+      },
+      onFilterChange () {
+        this.$nextTick(function () {
+          this.$refs.vuetable.refresh()
         })
-        .catch(err => {
-          this.loading = false;
-        });
-    },
-    onDelete(item, i) {
-      Swal.fire({
-        title: "Ders Adı :" + " " + item.lName + "\n" + this.$t("sureDelete"),
-        confirmButtonText: this.$t("yes"),
-        icon: "info",
-        confirmButtonColor: "red",
-        cancelButtonText: this.$t("no"),
-        showCancelButton: true
-      }).then(res => {
-        if (res.value) {
-          this.loading = true;
-          this.$store
-            .dispatch("deleteLessons", {
-              deleted: item,
-              index: i
-            })
-            .then(res => {
-              if (res.status) {
-                if (res.status === 200) {
-                  appPlugin.showalert(
-                    this.$t("deleteRecordMsg"),
-                    "",
-                    "success",
-                    this.$t("ok")
-                  );
-                }
-              } else {
-                appPlugin.showalert(
-                  this.$t("deleteRecordErrMsg"),
-                  "",
-                  "error",
-                  this.$t("ok")
-                );
-              }
-              this.onRefreshTableContent();
-              this.loading = false;
-            });
-        }
-      });
-    },
-    onFetchApi(apiUrl, httpOptions) {
-      var data;
-      let query;
-      if (this.txt.trim() != "") {
-        if (this.selectedLessonFilter == 2) {
-          query = appPlugin.urlParse("lName%" + this.txt + "& parent_id=0");
-        } else {
-          query = appPlugin.urlParse(
-            "lName%" +
-              this.txt +
-              "& type=" +
-              this.selectedLessonFilter +
-              "& parent_id=0"
-          );
-        }
-        data = this.$store.dispatch("fetchLessons", {
-          httpOpt: httpOptions,
-          query: query
-          //appPlugin.urlParse('lName%' + this.txt + '& type=' + this.selectedLessonFilter + '& parent_id=0')
-        });
-        data.then(res => {
-          this.currentData = res;
-        });
-        return data;
-      } else {
-        if (this.selectedLessonFilter == 2) {
-          query = appPlugin.urlParse("parent_id=0");
-        } else {
-          query = appPlugin.urlParse(
-            "type=" + this.selectedLessonFilter + "& parent_id=0"
-          );
-        }
-        data = this.$store.dispatch("fetchLessons", {
-          httpOpt: httpOptions,
-          query: query
-          //appPlugin.urlParse('type=' + this.selectedLessonFilter + '& parent_id=0')
-        });
-        data.then(res => {
-          this.currentData = res;
-        });
-        return data;
-      }
-    },
-    onChangePage(page) {
-      this.$refs.vuetable.changePage(page);
-    },
-    onPaginationData(paginationData) {
-      this.$refs.pagination.setPaginationData(paginationData);
-      this.$refs.paginationInfo.setPaginationData(paginationData);
-    },
-    onLoading() {
-      this.loading = true;
-    },
-    onLoaded() {
-      this.loading = false;
-    },
-    onSuccess() {},
-    onError() {
-      this.loading = false;
-      appPlugin.showalert(this.$t("getRecordErro"), "", "error", this.$t("ok"));
-    },
-    onRefreshTableContent() {
-      this.$refs.vuetable.reload();
-    },
-    onSearchHandler(txt) {
-      this.txt = txt;
-      this.$nextTick(function() {
-        this.$refs.vuetable.refresh();
-      });
-    },
-    exportExcel() {
-      if (this.currentData.data.data.length > 0) {
-        const data = this.currentData.data.data;
-        const keys = ["lName", "lCode", "type"];
-        const header = ["Ders Kodu", "Ders Adı", "Ders Türü"];
-        appPlugin.exportExcelTable(data, "Dersler", 14, keys, header);
-      } else {
-        appPlugin.showalert(
-          this.$t('warning'),
-          this.$t('excelExportWarning'),
-          'info',
-          this.$t('ok')
-        )
+      },
+      exportallData () {
 
+        this.$store
+          .dispatch('fetchAllLessons')
+          .then(res => {
+            if (res.data.length > 0) {
+              res.data.forEach(item => {
+                if (item.type == 0) {
+                  item.type = 'Normal'
+                } else {
+                  item.type = 'Seçmeli'
+                }
+              })
+              const data = res.data
+              const keys = ['lName', 'lCode', 'type']
+              const header = ['Ders Kodu', 'Ders Adı', 'Ders Türü']
+              appPlugin.exportExcelTable(data, 'Dersler', 14, keys, header)
+            } else {
+              appPlugin.showalert(
+                this.$t('warning'),
+                this.$t('excelExportWarning'),
+                'info',
+                this.$t('ok')
+              )
+
+            }
+            this.onCloseIndıcator()
+          })
+          .catch(err => {
+            this.onCloseIndıcator()
+          })
+      },
+      onDelete (item, i) {
+        Swal.fire({
+          title: 'Ders Adı :' + ' ' + item.lName + '\n' + this.$t('sureDelete'),
+          confirmButtonText: this.$t('yes'),
+          icon: 'info',
+          confirmButtonColor: 'red',
+          cancelButtonText: this.$t('no'),
+          showCancelButton: true
+        }).then(res => {
+          if (res.value) {
+            this.onOpenIndıcator()
+            this.$store
+              .dispatch('deleteLessons', {
+                deleted: item,
+                index: i
+              })
+              .then(res => {
+                if (res.status) {
+                  if (res.status === 200) {
+                    appPlugin.showalert(
+                      this.$t('deleteRecordMsg'),
+                      '',
+                      'success',
+                      this.$t('ok')
+                    )
+                  }
+                } else {
+                  appPlugin.showalert(
+                    this.$t('deleteRecordErrMsg'),
+                    '',
+                    'error',
+                    this.$t('ok')
+                  )
+                }
+                this.onRefreshTableContent()
+                this.onCloseIndıcator()
+              })
+          }
+        })
+      },
+      onFetchApi (apiUrl, httpOptions) {
+        var data
+        let query
+        if (this.txt.trim() != '') {
+          if (this.selectedLessonFilter == 2) {
+            query = appPlugin.urlParse('lName%' + this.txt + '& parent_id=0')
+          } else {
+            query = appPlugin.urlParse(
+              'lName%' +
+              this.txt +
+              '& type=' +
+              this.selectedLessonFilter +
+              '& parent_id=0'
+            )
+          }
+          data = this.$store.dispatch('fetchLessons', {
+            httpOpt: httpOptions,
+            query: query
+            //appPlugin.urlParse('lName%' + this.txt + '& type=' + this.selectedLessonFilter + '& parent_id=0')
+          })
+          data.then(res => {
+            this.currentData = res
+          })
+          return data
+        } else {
+          if (this.selectedLessonFilter == 2) {
+            query = appPlugin.urlParse('parent_id=0')
+          } else {
+            query = appPlugin.urlParse(
+              'type=' + this.selectedLessonFilter + '& parent_id=0'
+            )
+          }
+          data = this.$store.dispatch('fetchLessons', {
+            httpOpt: httpOptions,
+            query: query
+            //appPlugin.urlParse('type=' + this.selectedLessonFilter + '& parent_id=0')
+          })
+          data.then(res => {
+            this.currentData = res
+          })
+          return data
+        }
+      },
+      exportExcel () {
+        if (this.currentData.data.data.length > 0) {
+          const data = this.currentData.data.data
+          const keys = ['lName', 'lCode', 'type']
+          const header = ['Ders Kodu', 'Ders Adı', 'Ders Türü']
+          appPlugin.exportExcelTable(data, 'Dersler', 14, keys, header)
+        } else {
+          appPlugin.showalert(
+            this.$t('warning'),
+            this.$t('excelExportWarning'),
+            'info',
+            this.$t('ok')
+          )
+
+        }
       }
-    }
-  },
-  components: {
-    VInputContainer,
-    VSelect,
-    SearchBox,
-    Loading,
-    VButton,
-    VInput,
-    VTooltipButton,
-    Vuetable,
-    VuetablePaginationBootstrap,
-    VuetablePaginationInfo,
-    Flex,
-    FlexCard
+    },
   }
-};
 </script>
 
 <style scoped>

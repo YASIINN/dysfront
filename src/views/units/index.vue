@@ -128,20 +128,13 @@
 
 <script>
   import {
-    SearchBox,
-    Loading,
-    FlexCard,
-    Flex,
-    VButton,
     required,
-    VInput,
-    VTooltipButton,
-    Vuetable,
     Swal,
-    VuetablePaginationBootstrap,
-    VuetablePaginationInfo,
     appPlugin
   } from '@/Providers/defaultImports'
+  import loadingMixins from '@/mixins/loading'
+  import vuetableMixins from '@/mixins/vuetable'
+  import defaulcomponentsMixins from '@/mixins/defaultcomponents'
   import {
     FETCH_UNITS,
     CREATE_UNITS,
@@ -152,18 +145,7 @@
 
   export default {
     name: 'index',
-    components: {
-      FlexCard,
-      Flex,
-      SearchBox,
-      Loading,
-      VInput,
-      VButton,
-      VTooltipButton,
-      Vuetable,
-      VuetablePaginationBootstrap,
-      VuetablePaginationInfo
-    },
+    mixins: [loadingMixins, vuetableMixins, defaulcomponentsMixins],
     validations: {
       unitData: {
         name: {
@@ -176,26 +158,17 @@
     },
     data () {
       return {
-        currentData: [],
-        moreParams: {},
-        txt: '',
-        loading: false,
-        dataselected: false,
         unitData: {
           name: '',
           code: ''
         },
-        selectedData: {}
       }
-    },
-
-    created () {
     },
     methods: {
       exportallData () {
-        this.loading = true
+        this.onOpenIndıcator()
         this.$store.dispatch(FETCH_ALL_UNITS).then((res) => {
-          this.loading = false
+          this.onCloseIndıcator()
           if (res.data.length > 0) {
             let data = res.data
             let keys = ['uCode', 'uName']
@@ -210,26 +183,7 @@
             )
           }
         }).catch((err) => {
-          this.loading = false
-        })
-      },
-      onChangePage (page) {
-        this.$refs.vuetable.changePage(page)
-      },
-      onPaginationData (paginationData) {
-        this.$refs.pagination.setPaginationData(paginationData)
-        this.$refs.paginationInfo.setPaginationData(paginationData)
-      },
-      onLoading () {
-        this.loading = true
-      },
-      onLoaded () {
-        this.loading = false
-      },
-      onSearchHandler (txt) {
-        this.txt = txt
-        this.$nextTick(function () {
-          this.$refs.vuetable.refresh()
+          this.onCloseIndıcator()
         })
       },
       onDelete (item, i) {
@@ -242,7 +196,7 @@
           showCancelButton: true
         }).then(res => {
           if (res.value) {
-            this.loading = true
+            this.onOpenIndıcator()
             this.$store
               .dispatch(DELETE_UNITS, {
                 deleted: item,
@@ -268,7 +222,7 @@
                 }
 
                 this.onRefreshTableContent()
-                this.loading = false
+                this.onCloseIndıcator()
               })
           }
         })
@@ -296,15 +250,6 @@
           code: ''
         }
       },
-      onError () {
-        this.loading = false
-        appPlugin.showalert(
-          this.$t('getRecordErro'),
-          '',
-          'error',
-          this.$t('ok')
-        )
-      },
       onUpdate () {
         if (this.$v.unitData.code.$invalid) {
           appPlugin.showalert(
@@ -321,7 +266,7 @@
             this.$t('ok')
           )
         } else {
-          this.loading = true
+          this.onOpenIndıcator()
           this.$store.dispatch(UPDATE_UNITS, this.unitData).then(res => {
             if (res.status) {
               if (res.status === 200) {
@@ -349,17 +294,10 @@
             }
 
             this.onRefreshTableContent()
-            this.loading = false
+            this.onCloseIndıcator()
             this.onResetData()
           })
         }
-      },
-      onSuccess () {
-        /* succesFetchDataApi */
-      },
-      onCancel () {
-        this.dataselected = !this.dataselected
-        this.onResetData()
       },
       onSelectData (data) {
         this.dataselected = true
@@ -368,12 +306,6 @@
           code: data.uCode,
           id: data.id
         }
-      },
-      onAction (action, data, index) {
-        console.log('slot) action: ' + action, data, index)
-      },
-      onRefreshTableContent () {
-        this.$refs.vuetable.reload()
       },
       onFetchApi (apiUrl, httpOptions) {
         var data
@@ -413,7 +345,7 @@
             this.$t('ok')
           )
         } else {
-          this.loading = true
+          this.onOpenIndıcator()
           let data = {
             created: this.unitData,
             urlparse: appPlugin.urlParse(
@@ -443,7 +375,7 @@
               )
             }
             this.onRefreshTableContent()
-            this.loading = false
+            this.onCloseIndıcator()
           })
         }
       }

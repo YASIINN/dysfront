@@ -134,33 +134,36 @@
     VTooltipButton,
     appPlugin
   } from '@/Providers/defaultImports'
+  import loadingMixins from '@/mixins/loading'
 
   export default {
+    mixins: [loadingMixins],
     created () {
       //TODO ptypes 1 olacak muhakkak default
-      this.loading = true
+      this.onOpenIndıcator()
+
       this.$store.dispatch(FETCH_SCHOOL_P_TYPE).then((res) => {
-        this.loading = false
+        this.onCloseIndıcator()
       }).catch((err) => {
-        this.loading = false
+        this.onCloseIndıcator()
         appPlugin.showalert(this.$t('warning'), this.$t('getRecordErro', 'eror', this.$t('ok')))
       })
 
       this.$store.dispatch(FETCH_DTYPE).then((res) => {
-        this.loading = false
+        this.onCloseIndıcator()
         res.data.unshift({ id: 0, dtName: 'Tümü' })
         this.dtypes = res.data
       }).catch((err) => {
-        this.loading = false
+        this.onCloseIndıcator()
 
         appPlugin.showalert(this.$t('warning'), this.$t('getRecordErro', 'eror', this.$t('ok')))
 
       })
       this.$store.dispatch(FETCH_ALL_SCHOOLS).then((res) => {
 
-        this.loading = false
+        this.onCloseIndıcator()
       }).catch((err) => {
-        this.loading = false
+        this.onCloseIndıcator()
         appPlugin.showalert(this.$t('warning'), this.$t('getRecordErro', 'eror', this.$t('ok')))
       })
     },
@@ -182,7 +185,7 @@
     methods: {
       onChangeDType (item, i, k, dtype) {
         //ptype
-        this.loading = true
+        this.onOpenIndıcator()
         let today = moment(this.today).format('YYYY-MM-DD')
         this.$store.dispatch(FETCH_GETSTUDENT_DISCONT, {
           day: today,
@@ -202,9 +205,10 @@
             }
           }
           this.dstudentlist = res.data
-          this.loading = false
+          this.onCloseIndıcator()
+
         }).catch((err) => {
-          this.loading = false
+          this.onCloseIndıcator()
           appPlugin.showalert(this.$t('warning'), this.$t('getRecordErro'), 'error', this.$t('ok'))
         })
       },
@@ -217,7 +221,7 @@
           appPlugin.showalert(this.$t('warning'), this.$t('pleaseselectclass'), 'info', this.$t('ok'))
         } else {
           debugger
-          this.loading = true
+          this.onOpenIndıcator()
           let today = moment(this.today).format('YYYY-MM-DD')
           debugger
           this.$store.commit(SET_DISCONT_STUDENTS_LISTS, [])
@@ -238,17 +242,17 @@
               }
               this.dstudentlist = res.data
             }
-            this.loading = false
+            this.onCloseIndıcator()
 
           }).catch((err) => {
-            this.loading = false
+            this.onCloseIndıcator()
             appPlugin.showalert(this.$t('warning'), this.$t('getRecordErro'), 'error', this.$t('ok'))
 
           })
         }
       },
       onChangeSchool (data) {
-        this.loading = true
+        this.onOpenIndıcator()
         this.$store.dispatch(FETCH_ALL_SCHOOL_CLASES_BRANCHES_PIVOT, {
           urlparse: appPlugin.urlParse('school_id=' + data.id)
         }).then((res) => {
@@ -258,9 +262,9 @@
             })
             this.schoolClasBranchData = res.data
           }
-          this.loading = false
+          this.onCloseIndıcator()
         }).catch((err) => {
-          this.loading = false
+          this.onCloseIndıcator()
         })
       }
     },
@@ -273,7 +277,6 @@
         schoolClasBranchData: [],
         selectedclass: '',
         selectedschool: '',
-        loading: false,
         today: new Date()
       }
     }

@@ -128,6 +128,7 @@
 </template>
 
 <script>
+
   import { mapGetters } from 'vuex'
   import {
     FETCH_TITLES,
@@ -137,20 +138,13 @@
     FETCH_ALL_TITLES
   } from '@/store/modules/titles/moduleNames'
   import {
-    SearchBox,
-    Loading,
-    FlexCard,
-    Flex,
-    VButton,
     required,
-    VInput,
-    VTooltipButton,
-    Vuetable,
     Swal,
-    VuetablePaginationBootstrap,
-    VuetablePaginationInfo,
     appPlugin
   } from '@/Providers/defaultImports'
+  import loadingMixins from '@/mixins/loading'
+  import vuetableMixins from '@/mixins/vuetable'
+  import defaulcomponentsMixins from '@/mixins/defaultcomponents'
   export default {
     name: 'index',
     computed: {
@@ -161,18 +155,7 @@
         }
       }
     },
-    components: {
-      Flex,
-      FlexCard,
-      SearchBox,
-      Loading,
-      VInput,
-      VButton,
-      VTooltipButton,
-      Vuetable,
-      VuetablePaginationBootstrap,
-      VuetablePaginationInfo
-    },
+    mixins: [loadingMixins,defaulcomponentsMixins,vuetableMixins],
     validations: {
       titleData: {
         name: {
@@ -185,26 +168,17 @@
     },
     data () {
       return {
-        currentData: [],
-        moreParams: {},
-        txt: '',
-        loading: false,
-        dataselected: false,
         titleData: {
           name: '',
           code: ''
         },
-        selectedData: {}
       }
-    },
-
-    created () {
     },
     methods: {
       exportallData () {
-        this.loading = true
+        this.onOpenIndıcator()
         this.$store.dispatch(FETCH_ALL_TITLES).then((res) => {
-          this.loading = false
+          this.onCloseIndıcator()
           if (res.length > 0) {
             let data = res
             let keys = ['tCode', 'tName']
@@ -220,26 +194,7 @@
           }
 
         }).catch((err) => {
-          this.loading = false
-        })
-      },
-      onChangePage (page) {
-        this.$refs.vuetable.changePage(page)
-      },
-      onPaginationData (paginationData) {
-        this.$refs.pagination.setPaginationData(paginationData)
-        this.$refs.paginationInfo.setPaginationData(paginationData)
-      },
-      onLoading () {
-        this.loading = true
-      },
-      onLoaded () {
-        this.loading = false
-      },
-      onSearchHandler (txt) {
-        this.txt = txt
-        this.$nextTick(function () {
-          this.$refs.vuetable.refresh()
+          this.onCloseIndıcator()
         })
       },
       onDelete (item, i) {
@@ -252,7 +207,7 @@
           showCancelButton: true
         }).then(res => {
           if (res.value) {
-            this.loading = true
+            this.onOpenIndıcator()
             this.$store
               .dispatch(DELETE_TITLE, {
                 deleted: item,
@@ -271,15 +226,14 @@
                 } else {
                   appPlugin.showalert(
                     this.$t('deleteRecordErrMsg'),
-                  '',
+                    '',
                     'error',
                     this.$t('ok')
-
-                )
+                  )
                 }
 
                 this.onRefreshTableContent()
-                this.loading = false
+                 this.onCloseIndıcator()
               })
           }
         })
@@ -307,17 +261,6 @@
           code: ''
         }
       },
-      onError (err) {
-
-        this.loading = false
-
-        appPlugin.showalert(
-          this.$t('getRecordErro'),
-          '',
-          'error',
-          this.$t('ok')
-        )
-      },
       onUpdate () {
         if (this.$v.titleData.code.$invalid) {
           appPlugin.showalert(
@@ -334,7 +277,7 @@
             this.$t('ok')
           )
         } else {
-          this.loading = true
+          this.onOpenIndıcator()
           this.$store.dispatch(UPDATE_TITLE, this.titleData).then(res => {
             if (res.status) {
               if (res.status === 200) {
@@ -362,17 +305,10 @@
             }
 
             this.onRefreshTableContent()
-            this.loading = false
+             this.onCloseIndıcator()
             this.onResetData()
           })
         }
-      },
-      onSuccess () {
-        /* succesFetchDataApi */
-      },
-      onCancel () {
-        this.dataselected = !this.dataselected
-        this.onResetData()
       },
       onSelectData (data) {
         this.dataselected = true
@@ -382,11 +318,7 @@
           id: data.id
         }
       },
-      onRefreshTableContent () {
-        this.$refs.vuetable.reload()
-      },
       onFetchApi (apiUrl, httpOptions) {
-
         var data
         if (this.txt.trim() != '') {
           data = this.$store.dispatch(FETCH_TITLES, {
@@ -425,7 +357,7 @@
             this.$t('ok')
           )
         } else {
-          this.loading = true
+          this.onOpenIndıcator()
           let data = {
             created: this.titleData,
             urlparse: appPlugin.urlParse(
@@ -455,7 +387,7 @@
               )
             }
             this.onRefreshTableContent()
-            this.loading = false
+             this.onCloseIndıcator()
           })
         }
       }

@@ -95,8 +95,10 @@
   } from '../../store/modules/post/moduleNames'
   import defaultImage from '@/assets/img/defaultavatar.png'
   import Vue from 'vue'
+  import loadingMixins from '@/mixins/loading'
 
   export default {
+    mixins: [loadingMixins],
     components: {
       FlexCard,
       Flex,
@@ -115,20 +117,20 @@
             if (res.data.length < 1) {
               this.$router.push('/social')
             }
-            this.loading = false
+            this.onCloseIndıcator()
           }).catch((err) => {
-            this.loading = false
+            this.onCloseIndıcator()
           })
         }
       }
     },
     methods: {
       getComment () {
-        this.loading = true
+        this.onOpenIndıcator()
         this.$store.dispatch(FETCH_POST_COMMENT, { postid: this.$route.params.id }).then((res) => {
-          this.loading = false
+          this.onCloseIndıcator()
         }).catch((err) => {
-          this.loading = false
+          this.onCloseIndıcator()
           appPlugin.showalert(this.$t('warning'), this.$t('fetchError'), 'error', this.$t('ok'))
         })
       },
@@ -201,7 +203,6 @@
     data () {
       return {
         defaultPreview: defaultImage,
-        loading: false,
       }
     },
     name: 'postdetail'

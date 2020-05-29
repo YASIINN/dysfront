@@ -97,6 +97,7 @@
     GET_SCHOOL_P_TYPE
   } from '@/store/modules/schoolprogramtypepivot/moduleNames'
   import { mapGetters } from 'vuex'
+  import loadingMixins from '@/mixins/loading'
 
   export default {
     created () {
@@ -104,6 +105,7 @@
       this.fetchPTypes()
       this.fetchUserStudent()
     },
+    mixins: [loadingMixins],
     data () {
       return {
         activityView: false,
@@ -139,9 +141,7 @@
         ],
         selectedptype: { id: 0, ptName: 'Program Türü Seçiniz' },
         ptypeslist: [],
-        loading: false,
         selectedStudent: {},
-        loading: false
       }
     },
     components: {
@@ -244,7 +244,7 @@
 
       },
       fetchPTypes () {
-        this.loading = true
+        this.onOpenIndıcator()
         this.$store.dispatch('fetchPTypes').then((res) => {
           let data = this.$store.getters.ptypes
           data.unshift({
@@ -298,7 +298,7 @@
         /*this.selectedStudent = {}*/
       },
       fetchUserStudent () {
-        this.loading = true
+        this.onOpenIndıcator()
         this.$store.dispatch(FETCH_USER_STUDENTS, {
           userid: 2
         }).then((res) => {
@@ -306,10 +306,11 @@
             this.selectedStudent = res.data[0]
             /*   this.fetchDiscont()*/
           }
-          this.loading = false
+
+          this.onCloseIndıcator()
         }).catch((err) => {
           debugger
-          this.loading = false
+          this.onCloseIndıcator()
           appPlugin.showalert(this.$t('warning'), 'Öğrenci Bilgileri Getirilirken Hata Gerçekleşti Lütfen Daha Sonra Tekrar Deneyin', 'error', this.$t('ok'))
         })
       }

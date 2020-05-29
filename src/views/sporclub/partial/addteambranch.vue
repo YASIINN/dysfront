@@ -83,165 +83,167 @@
   </flex-card>
 </template>
 <script>
-import {
-  appPlugin,
-  SearchBox,
-  Loading,
-  VSelect,
-  AlertBox,
-  FlexCard,
-  Flex,
-  VButton,
-  VTabs,
-  VTabContent,
-  Multiselect,
-  VTooltipButton,
-  Vuetable,
-  VuetablePaginationBootstrap,
-  VuetablePaginationInfo
-} from "@/Providers/defaultImports";
-
-export default {
-  name: "addteambranch",
-  created() {
-    this.fetchTeamData();
-    this.fetchSporClubBranchData();
-  },
-  props: {
-    sporClub: {}
-  },
-  methods: {
-    onCloseAlert(event) {
-      this.showAlert = false;
-    },
-    onCloseBranchAlert(event) {
-      this.showbranchAlert = false;
-    },
-    onTouch() {
-      this.isTouched = true;
-    },
-    resetData() {
-      (this.selectedBranches = []), (this.selectedClass = []);
-    },
-    addSporClubBranch() {
-      let data = [];
-      if (isNaN(+this.$route.params.id) == false) {
-        if (this.isInvalid) {
-          appPlugin.showalert(
-            "Uyarı",
-            "Lütfen Takım ve Şube Seçimi Yapınız",
-            "error",
-            this.$t('ok')
-          );
-        } else {
-          this.selectedBranches.forEach(item => {
-            data.push({
-              clubid: this.$route.params.id,
-              teamid: this.selectedClass.id,
-              branchid: item.id
-            });
-          });
-          this.$store
-            .dispatch("createSCTeamBranch", { dataList: data })
-            .then(res => {
-              if (res.status) {
-                if (res.status == 200) {
-                  appPlugin.showalert("Kayıt Eklendi", "", "success", this.$t('ok'));
-                  this.$emit("onSuccesAdd", true);
-                  this.resetData();
-                }
-              } else {
-                this.$emit("onSuccesAdd", false);
-                appPlugin.showalert(
-                  "Kayıt Eklenirken Hata Gerçekleşti Lütfen Daha Sonra Tekrar Deneyin",
-                  "",
-                  "error",
-                  this.$t('ok')
-                );
-              }
-            })
-            .catch(err => {
-              this.$emit("onSuccesAdd", false);
-              appPlugin.showalert(
-                "Kayıt Eklenirken Hata Gerçekleşti Lütfen Daha Sonra Tekrar Deneyin",
-                "",
-                "error",
-                this.$t('ok')
-              );
-            });
-        }
-      } else {
-        appPlugin.showalert(
-          this.$t("invalidparam"),
-          "",
-          "error",
-          this.$t("ok")
-        );
-        this.$router.replace("/sporclub");
-      }
-    },
-    fetchTeamData() {
-      this.loading = true;
-      this.$store
-        .dispatch("fetchAllTeams")
-        .then(res => {
-          if (res.length < 1) {
-            this.showAlert = true;
-          } else {
-            this.showAlert = false;
-          }
-          this.loading = false;
-        })
-        .catch(err => {
-          this.loading = false;
-        });
-    },
-    fetchSporClubBranchData() {
-      this.loading = true;
-      this.$store
-        .dispatch("fetchAllSCBBranches")
-        .then(res => {
-          console.log("şube datası", res);
-          this.loading = false;
-        })
-        .catch(err => {
-          this.loading = false;
-        });
-    }
-  },
-  computed: {
-    isInvalid() {
-      return (
-        (this.isTouched && this.selectedClass.length === 0) ||
-        this.selectedBranches.length === 0
-      );
-    }
-  },
-  data() {
-    return {
-      showAlert: false,
-      showbranchAlert: false,
-      selectedBranches: [],
-      selectedClass: [],
-      loading: false,
-      isTouched: false
-    };
-  },
-  components: {
-    AlertBox,
-    Multiselect,
-    VSelect,
-    VTabs,
-    FlexCard,
-    Flex,
-    VTabContent,
+  import {
+    appPlugin,
     SearchBox,
     Loading,
+    VSelect,
+    AlertBox,
+    FlexCard,
+    Flex,
     VButton,
+    VTabs,
+    VTabContent,
+    Multiselect,
     VTooltipButton,
     Vuetable,
     VuetablePaginationBootstrap,
     VuetablePaginationInfo
+  } from '@/Providers/defaultImports'
+  import loadingMixins from '@/mixins/loading'
+
+  export default {
+    name: 'addteambranch',
+    created () {
+      this.fetchTeamData()
+      this.fetchSporClubBranchData()
+    },
+    props: {
+      sporClub: {}
+    },
+    mixins: [loadingMixins],
+    methods: {
+      onCloseAlert (event) {
+        this.showAlert = false
+      },
+      onCloseBranchAlert (event) {
+        this.showbranchAlert = false
+      },
+      onTouch () {
+        this.isTouched = true
+      },
+      resetData () {
+        (this.selectedBranches = []), (this.selectedClass = [])
+      },
+      addSporClubBranch () {
+        let data = []
+        if (isNaN(+this.$route.params.id) == false) {
+          if (this.isInvalid) {
+            appPlugin.showalert(
+              'Uyarı',
+              'Lütfen Takım ve Şube Seçimi Yapınız',
+              'error',
+              this.$t('ok')
+            )
+          } else {
+            this.selectedBranches.forEach(item => {
+              data.push({
+                clubid: this.$route.params.id,
+                teamid: this.selectedClass.id,
+                branchid: item.id
+              })
+            })
+            this.$store
+              .dispatch('createSCTeamBranch', { dataList: data })
+              .then(res => {
+                if (res.status) {
+                  if (res.status == 200) {
+                    appPlugin.showalert('Kayıt Eklendi', '', 'success', this.$t('ok'))
+                    this.$emit('onSuccesAdd', true)
+                    this.resetData()
+                  }
+                } else {
+                  this.$emit('onSuccesAdd', false)
+                  appPlugin.showalert(
+                    'Kayıt Eklenirken Hata Gerçekleşti Lütfen Daha Sonra Tekrar Deneyin',
+                    '',
+                    'error',
+                    this.$t('ok')
+                  )
+                }
+              })
+              .catch(err => {
+                this.$emit('onSuccesAdd', false)
+                appPlugin.showalert(
+                  'Kayıt Eklenirken Hata Gerçekleşti Lütfen Daha Sonra Tekrar Deneyin',
+                  '',
+                  'error',
+                  this.$t('ok')
+                )
+              })
+          }
+        } else {
+          appPlugin.showalert(
+            this.$t('invalidparam'),
+            '',
+            'error',
+            this.$t('ok')
+          )
+          this.$router.replace('/sporclub')
+        }
+      },
+      fetchTeamData () {
+        this.onOpenIndıcator()
+        this.$store
+          .dispatch('fetchAllTeams')
+          .then(res => {
+            if (res.length < 1) {
+              this.showAlert = true
+            } else {
+              this.showAlert = false
+            }
+
+            this.onCloseIndıcator()
+          })
+          .catch(err => {
+            this.onCloseIndıcator()
+          })
+      },
+      fetchSporClubBranchData () {
+        this.onOpenIndıcator()
+        this.$store
+          .dispatch('fetchAllSCBBranches')
+          .then(res => {
+            console.log('şube datası', res)
+            this.onCloseIndıcator()
+          })
+          .catch(err => {
+            this.onCloseIndıcator()
+          })
+      }
+    },
+    computed: {
+      isInvalid () {
+        return (
+          (this.isTouched && this.selectedClass.length === 0) ||
+          this.selectedBranches.length === 0
+        )
+      }
+    },
+    data () {
+      return {
+        showAlert: false,
+        showbranchAlert: false,
+        selectedBranches: [],
+        selectedClass: [],
+        isTouched: false
+      }
+    },
+    components: {
+      AlertBox,
+      Multiselect,
+      VSelect,
+      VTabs,
+      FlexCard,
+      Flex,
+      VTabContent,
+      SearchBox,
+      Loading,
+      VButton,
+      VTooltipButton,
+      Vuetable,
+      VuetablePaginationBootstrap,
+      VuetablePaginationInfo
+    }
   }
-};
 </script>

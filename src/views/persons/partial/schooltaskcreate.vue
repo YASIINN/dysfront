@@ -135,9 +135,11 @@
     appPlugin
   } from '@/Providers/defaultImports'
   import { Datetime } from 'vue-datetime'
+  import loadingMixins from '@/mixins/loading'
 
   export default {
     name: 'schooltaskcreate',
+    mixins: [loadingMixins],
     props: {
       user: {}
     },
@@ -157,7 +159,6 @@
         },
         schoolLessonsData: [],
         personClasesData: [],
-        loading: false,
         isTouched: false,
         schoolTaskStatus: 0,
         personSchoolData: [],
@@ -172,7 +173,7 @@
     },
     methods: {
       addLessonUserData (userId) {
-        this.loading = true
+        this.onOpenIndıcator()
         let data = []
         let lessonsData = []
         this.personData.schools.forEach((item) => {
@@ -190,15 +191,15 @@
 
           if (res.status) {
             if (res.status == 200) {
-              this.loading = false
+              this.onCloseIndıcator()
               this.addUserSchoolLessonData(userId)
             }
           } else {
-            this.loading = false
+            this.onCloseIndıcator()
             appPlugin.showalert('Personel Derslere Eklenirken Hata Gerçekleşti', '', 'error', 'Tamam')
           }
         }).catch((err) => {
-          this.loading = false
+          this.onCloseIndıcator()
           appPlugin.showalert('Personel Derslere Eklenirken Hata Gerçekleşti', '', 'error', 'Tamam')
           //personel ders eklenme hatası
 
@@ -209,7 +210,7 @@
       },
       addUserSchoolClasesBranchesData (userId) {
 
-        this.loading = true
+        this.onOpenIndıcator()
         this.personData.schools.forEach((item) => {
           var data = []
           item.clases.forEach((clases) => {
@@ -231,21 +232,21 @@
                 this.personSchoolData = []
                 this.personClasesData = []
                 this.personLessonData = []
-                this.loading = false
+                this.onCloseIndıcator()
               }
             } else {
               appPlugin.showalert('Personel İlgili Okul Sınıf ve Şube Atamaları Oluşturulurken Hata Gerçekleşti', '', 'error', 'Tamam')
-              this.loading = false
+              this.onCloseIndıcator()
             }
           }).catch((err) => {
-            this.loading = false
+            this.onCloseIndıcator()
             appPlugin.showalert('Personel İlgili Okul Sınıf ve Şube Atamaları Oluşturulurken Hata Gerçekleşti', '', 'error', 'Tamam')
             //user okul ders hata
           })
         })
       },
       addUserSchoolClasesData (userId) {
-        this.loading = true
+        this.onOpenIndıcator()
         this.addUserSchoolClasesBranchesData(userId)
         this.personData.schools.forEach((item) => {
           var data = []
@@ -261,21 +262,21 @@
           }).then((res) => {
             if (res.status) {
               if (res.status == 200) {
-                this.loading = true
+                this.onOpenIndıcator()
               }
             } else {
-              this.loading = false
+              this.onCloseIndıcator()
               appPlugin.showalert('Personel İlgili Okul Ve Sınıfa Eklenirken Hata Gerçekleşti', '', 'error', 'Tamam')
             }
           }).catch((err) => {
-            this.loading = false
+            this.onCloseIndıcator()
             appPlugin.showalert('Personel İlgili Okul Ve Sınıfa Eklenirken Hata Gerçekleşti', '', 'error', 'Tamam')
           })
         })
       },
       addUserSchoolLessonData (userId) {
 
-        this.loading = true
+        this.onOpenIndıcator()
         this.addUserSchoolClasesData(userId)
         this.personData.schools.forEach((item) => {
           var data = []
@@ -291,16 +292,16 @@
           }).then((res) => {
             if (res.status) {
               if (res.status == 200) {
-                this.loading = false
+                this.onCloseIndıcator()
               } else {
-                this.loading = false
+                this.onCloseIndıcator()
               }
             } else {
-              this.loading = false
+              this.onCloseIndıcator()
             }
             console.log('userokulders', res.status)
           }).catch((err) => {
-            this.loading = false
+            this.onCloseIndıcator()
             appPlugin.showalert('Personel Okul ve Derslere Eklenirken Hata Gerçekleşti', '', 'error', 'Tamam')
           })
         })
@@ -318,7 +319,7 @@
         }).then((res) => {
           if (res.status) {
             if (res.status == 200) {
-              this.loading = false
+              this.onCloseIndıcator()
               if (this.schoolTaskStatus == 0) {
                 this.addLessonUserData(userID)
               } else {
@@ -331,11 +332,11 @@
               appPlugin.showalert('Personel  Okullara Başarıyla Eklendi ', '', 'success', 'Tamam')
             }
           } else {
-            this.loading = false
+            this.onCloseIndıcator()
             appPlugin.showalert('Personel  Okullara Eklenirken Hata Gerçekleşti ', '', 'error', 'Tamam')
           }
         }).catch((err) => {
-          this.loading = false
+          this.onCloseIndıcator()
           appPlugin.showalert('Personel Okullara Eklenirken Hata Gerçekleşti ', '', 'error', 'Tamam')
         })
 
@@ -344,7 +345,7 @@
         if (this.personData.schools.length < 1) {
           appPlugin.showalert('Uyarı', 'Lütfen Personelin  görevli Olduğu Sınıf Ve Dersleri Seçiniz', 'warning', 'Tamam')
         } else {
-          this.loading = true
+          this.onOpenIndıcator()
           this.addSchoolUserData(this.user.id)
         }
       },
@@ -396,7 +397,7 @@
       },
       onChangeSchool (data) {
         if (this.schoolTaskStatus == 0) {
-          this.loading = true
+          this.onOpenIndıcator()
           this.personClasesData = []
           this.$store.dispatch('fetchSchoolClasesBranchesPivotAll', {
             urlparse: appPlugin.urlParse('school_id=' + data.id)
@@ -407,16 +408,16 @@
               })
               this.schoolClasBranchData = res.data
             }
-            this.loading = false
+            this.onCloseIndıcator()
           }).catch((err) => {
-            this.loading = false
+            this.onCloseIndıcator()
           })
           this.$store.dispatch('fetchAllSchoolLessonsPivot', {
             urlparse: appPlugin.urlParse('school_id=' + data.id)
           }).then((res) => {
             this.schoolLessonsData = res.data
           }).catch((err) => {
-            this.loading = false
+            this.onCloseIndıcator()
           })
 
           if (this.personData.schools.length > 0) {

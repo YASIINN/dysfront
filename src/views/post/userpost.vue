@@ -100,9 +100,11 @@
   import spost from '@/components/spost/index'
   import _ from 'underscore'
   import Vue from 'vue'
+  import loadingMixins from '@/mixins/loading'
 
   export default {
     name: 'userpost',
+    mixins: [loadingMixins],
     components: {
       FlexCard,
       Flex,
@@ -122,8 +124,8 @@
         this.$store.dispatch(DELETE_POST, { id: item.id, index: i, deletedType: 'mypost' }).then((res) => {
           if (res.status && res.status == 200) {
             debugger
-            if(this.$store.getters.getUserPost.length<1){
-              this.loadMore("deleted")
+            if (this.$store.getters.getUserPost.length < 1) {
+              this.loadMore('deleted')
             }
             Vue.$toast.open({
               message: 'Gönderi Silindi',
@@ -200,9 +202,8 @@
         })
       },
       loadMore (type) {
+        this.onOpenIndıcator()
         debugger
-        this.loading = true
-debugger
         if (type && type == 'deleted') {
           let lastpageUrl = ''
           let pageUrl = ''
@@ -234,15 +235,15 @@ debugger
               this.nextPageUrl = ''
             }
             debugger
-            this.loading = false
+            this.onCloseIndıcator()
           }).catch((err) => {
             debugger
-            this.loading = false
+            this.onCloseIndıcator()
             appPlugin.showalert(this.$t('warning'),
               this.$t('fetchError'), 'error',
               this.$t('ok'))
           })
-          this.loading = false
+          this.onCloseIndıcator()
         } else {
           if (this.nextPageUrl == this.lastPageUrl) {
             debugger
@@ -256,15 +257,15 @@ debugger
               if (res.data.next_page_url != null) {
                 this.nextPageUrl = res.data.next_page_url
               }
-              this.loading = false
+              this.onCloseIndıcator()
             }).catch((err) => {
-              this.loading = false
+              this.onCloseIndıcator()
               appPlugin.showalert(this.$t('warning'),
                 this.$t('fetchError'), 'error',
                 this.$t('ok'))
             })
             this.nextPageUrl = ''
-            this.loading = false
+            this.onCloseIndıcator()
           } else {
             debugger
             this.$store.dispatch(FETCH_NEXT_USERS_POST, {
@@ -276,14 +277,14 @@ debugger
               if (res.data.next_page_url != null) {
                 this.nextPageUrl = res.data.next_page_url
               }
-              this.loading = false
+              this.onCloseIndıcator()
             }).catch((err) => {
-              this.loading = false
+              this.onCloseIndıcator()
               appPlugin.showalert(this.$t('warning'),
                 this.$t('fetchError'), 'error',
                 this.$t('ok'))
             })
-            this.loading = false
+            this.onCloseIndıcator()
           }
         }
       },
@@ -321,7 +322,7 @@ debugger
       },
       fetchUserPost () {
         debugger
-        this.loading = true
+        this.onOpenIndıcator()
         this.$store.dispatch(FETCH_USER_POST, {
           filterType: this.currentTabItem.id
         }).then((res) => {
@@ -334,18 +335,18 @@ debugger
             this.nextPageUrl = ''
           }
 
-          this.loading = false
+          this.onCloseIndıcator()
           debugger
         }).catch((err) => {
           appPlugin.showalert(this.$t('warning'), this.$t('fetchError'), 'error', this.$t('ok'))
-          this.loading = false
+          this.onCloseIndıcator()
         })
       },
       fetchPostType () {
         debugger
-        this.loading = true
+        this.onOpenIndıcator()
         this.$store.dispatch(FETCH_ALL_POST_TYPE).then((res) => {
-          this.loading = false
+          this.onCloseIndıcator()
           if (res) {
             debugger
             this.currentTabItem = {
@@ -360,7 +361,7 @@ debugger
             this.fetchUserPost()
           }
         }).catch((err) => {
-          this.loading = false
+          this.onCloseIndıcator()
           appPlugin.showalert(this.$t('warning'), this.$t('fetchError'), 'error', this.$t('ok'))
         })
       }
@@ -373,12 +374,7 @@ debugger
         filterTab: [],
         currentTab: 1,
         currentTabItem: '',
-        loading: false
       }
     }
   }
 </script>
-
-<style scoped>
-
-</style>

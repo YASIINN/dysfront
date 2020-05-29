@@ -66,208 +66,210 @@
   </v-tab-content>
 </template>
 <script>
-import SearchBox from "@/components/searchBox";
-import Loading from "@/components/loading";
-import VTooltipButton from "@/components/tooltipButton";
-import VTabContent from "@/components/tabbarcontent";
-import appPlugin from "@/Providers/appPlugins";
-import Vuetable from "vuetable-2/src/components/Vuetable";
-import VuetablePaginationBootstrap from "@/components/datatable/VuetablePaginationBootstrap";
-import VuetablePaginationInfo from "@/components/datatable/VuetablePaginationInfo";
-import Flex from "@/components/layout";
-import tooltip from "@/components/tooltip";
-import FlexCard from "@/components/flexwithcard";
-import Swal from "sweetalert2";
+  import SearchBox from '@/components/searchBox'
+  import Loading from '@/components/loading'
+  import VTooltipButton from '@/components/tooltipButton'
+  import VTabContent from '@/components/tabbarcontent'
+  import appPlugin from '@/Providers/appPlugins'
+  import Vuetable from 'vuetable-2/src/components/Vuetable'
+  import VuetablePaginationBootstrap from '@/components/datatable/VuetablePaginationBootstrap'
+  import VuetablePaginationInfo from '@/components/datatable/VuetablePaginationInfo'
+  import Flex from '@/components/layout'
+  import tooltip from '@/components/tooltip'
+  import FlexCard from '@/components/flexwithcard'
+  import Swal from 'sweetalert2'
+  import loadingMixins from '@/mixins/loading'
 
-export default {
-  name: "useractivityweektask",
-  data() {
-    return {
-      moreParamsActivityWeek: {},
-      txt: "",
-      currentData: [],
-      loading: false
-    };
-  },
-  components: {
-    Flex,
-    FlexCard,
-    tooltip,
-    VTabContent,
-    SearchBox,
-    Loading,
-    VTooltipButton,
-    Vuetable,
-    VuetablePaginationBootstrap,
-    VuetablePaginationInfo
-  },
-  props: {
-    user: {},
-    showDelete: {},
-    tabKey: {},
-    icon: {},
-    title: {},
-    loadActivityTask: {},
-    onreset: {}
-  },
-  watch: {
-    onreset: function(val) {
-      if (val == true) {
-        this.onRefresh();
-      }
-    }
-  },
-  methods: {
-    exportExcel() {
-      let data = this.currentData.data.data;
-      if (data.length < 1) {
-        appPlugin.showalert(
-          "Uyarı",
-          "Excele Veri Aktarmak İçin Tabloda Verileriniz Olması Gerekmektedir",
-          "info",
-          "Tamam"
-        );
-      } else {
-        let keys = ["aCode", "aName", "pCode", "pName"];
-        const header = [
-          "Faaliyet Kodu",
-          "Faaliyet Adı",
-          "Dönem Kodu",
-          "Dönem Adı"
-        ];
-        appPlugin.exportExcelTable(
-          data,
-          this.user[0].uName.toUpperCase() +
-            " " +
-            this.user[0].uSurname.toUpperCase() +
-            " " +
-            " Görevli Olduğu Haftalar",
-          14,
-          keys,
-          header
-        );
+  export default {
+    mixins: [loadingMixins],
+    name: 'useractivityweektask',
+    data () {
+      return {
+        moreParamsActivityWeek: {},
+        txt: '',
+        currentData: [],
       }
     },
-    allExportExcel() {
-      //TODO
+    components: {
+      Flex,
+      FlexCard,
+      tooltip,
+      VTabContent,
+      SearchBox,
+      Loading,
+      VTooltipButton,
+      Vuetable,
+      VuetablePaginationBootstrap,
+      VuetablePaginationInfo
     },
-    onRefresh() {
-      this.$refs.vuetableaw.reload();
+    props: {
+      user: {},
+      showDelete: {},
+      tabKey: {},
+      icon: {},
+      title: {},
+      loadActivityTask: {},
+      onreset: {}
     },
-    onDeleteUserActivityWeek(item) {
-      Swal.fire({
-        title:
-          this.$t("personname") +
-          this.user[0].uName.toUpperCase() +
-          " " +
-          this.user[0].uSurname.toUpperCase() +
-          "\n" +
-          "Hafta  :" +
-          item.pName +
-          "\n" +
-          this.$t("sureDelete"),
-        confirmButtonText: this.$t("yes"),
-        confirmButtonColor: "red",
-        cancelButtonText: this.$t("cancel"),
-        icon: "warning",
-        showCancelButton: true
-      }).then(res => {
-        if (res.value) {
-          this.loading = true;
-          this.$store
-            .dispatch("deleteUserActivityWeek", {
-              userid: this.user[0].id,
-              activityid: item.activity_id,
-              periodid: item.period_id
-            })
-            .then(res => {
-              if (res.status) {
-                if (res.status === 200) {
-                  appPlugin.showalert(
-                    this.$t("deleteRecordMsg"),
-                    "",
-                    "success",
-                    this.$t("ok")
-                  );
-                }
-              } else {
-                appPlugin.showalert(
-                  this.$t("deleteRecordErrMsg"),
-                  "",
-                  "error",
-                  this.$t("ok")
-                );
-              }
-              this.$refs.vuetableaw.reload();
-              this.loading = false;
-            });
+    watch: {
+      onreset: function (val) {
+        if (val == true) {
+          this.onRefresh()
         }
-      });
+      }
     },
-    onFetchUserActivityWeek(apiUrl, httpOptions) {
-      if (this.onreset) {
-        let data;
-        if (this.txt.trim() != "") {
-          if (isNaN(+this.$route.params.id) == false) {
-            data = this.$store.dispatch("fetchUserActivityWeek", {
-              id: this.$route.params.id,
-              httpOpt: httpOptions,
-              query: appPlugin.urlParse(
-                "pName%" + this.txt + "& user_id=" + this.$route.params.id
-              )
-            });
-            data.then(res => {
-              console.log("lalal", res);
-              this.currentData = res;
-            });
-            return data;
-          }
+    methods: {
+      exportExcel () {
+        let data = this.currentData.data.data
+        if (data.length < 1) {
+          appPlugin.showalert(
+            'Uyarı',
+            'Excele Veri Aktarmak İçin Tabloda Verileriniz Olması Gerekmektedir',
+            'info',
+            'Tamam'
+          )
         } else {
-          if (isNaN(+this.$route.params.id) == false) {
-            data = this.$store.dispatch("fetchUserActivityWeek", {
-              httpOpt: httpOptions,
-              id: this.$route.params.id,
-              query: appPlugin.urlParse("user_id=" + this.$route.params.id)
-            });
-            data.then(res => {
-              this.currentData = res;
-            });
-            return data;
+          let keys = ['aCode', 'aName', 'pCode', 'pName']
+          const header = [
+            'Faaliyet Kodu',
+            'Faaliyet Adı',
+            'Dönem Kodu',
+            'Dönem Adı'
+          ]
+          appPlugin.exportExcelTable(
+            data,
+            this.user[0].uName.toUpperCase() +
+            ' ' +
+            this.user[0].uSurname.toUpperCase() +
+            ' ' +
+            ' Görevli Olduğu Haftalar',
+            14,
+            keys,
+            header
+          )
+        }
+      },
+      allExportExcel () {
+        //TODO
+      },
+      onRefresh () {
+        this.$refs.vuetableaw.reload()
+      },
+      onDeleteUserActivityWeek (item) {
+        Swal.fire({
+          title:
+            this.$t('personname') +
+            this.user[0].uName.toUpperCase() +
+            ' ' +
+            this.user[0].uSurname.toUpperCase() +
+            '\n' +
+            'Hafta  :' +
+            item.pName +
+            '\n' +
+            this.$t('sureDelete'),
+          confirmButtonText: this.$t('yes'),
+          confirmButtonColor: 'red',
+          cancelButtonText: this.$t('cancel'),
+          icon: 'warning',
+          showCancelButton: true
+        }).then(res => {
+          if (res.value) {
+
+            this.$store
+              .dispatch('deleteUserActivityWeek', {
+                userid: this.user[0].id,
+                activityid: item.activity_id,
+                periodid: item.period_id
+              })
+              .then(res => {
+                if (res.status) {
+                  if (res.status === 200) {
+                    appPlugin.showalert(
+                      this.$t('deleteRecordMsg'),
+                      '',
+                      'success',
+                      this.$t('ok')
+                    )
+                  }
+                } else {
+                  appPlugin.showalert(
+                    this.$t('deleteRecordErrMsg'),
+                    '',
+                    'error',
+                    this.$t('ok')
+                  )
+                }
+                this.$refs.vuetableaw.reload()
+                this.onCloseIndıcator()
+              })
+          }
+        })
+      },
+      onFetchUserActivityWeek (apiUrl, httpOptions) {
+        if (this.onreset) {
+          let data
+          if (this.txt.trim() != '') {
+            if (isNaN(+this.$route.params.id) == false) {
+              data = this.$store.dispatch('fetchUserActivityWeek', {
+                id: this.$route.params.id,
+                httpOpt: httpOptions,
+                query: appPlugin.urlParse(
+                  'pName%' + this.txt + '& user_id=' + this.$route.params.id
+                )
+              })
+              data.then(res => {
+                console.log('lalal', res)
+                this.currentData = res
+              })
+              return data
+            }
+          } else {
+            if (isNaN(+this.$route.params.id) == false) {
+              data = this.$store.dispatch('fetchUserActivityWeek', {
+                httpOpt: httpOptions,
+                id: this.$route.params.id,
+                query: appPlugin.urlParse('user_id=' + this.$route.params.id)
+              })
+              data.then(res => {
+                this.currentData = res
+              })
+              return data
+            }
           }
         }
+      },
+      onLoadedUserActivityWeek () {
+        this.onCloseIndıcator()
+      },
+      onChangePageActivityWeek (page) {
+        this.$refs.vuetableaw.changePage(page)
+      },
+      onPaginationDataUserActivityWeek (paginationData) {
+        this.$refs.paginationaw.setPaginationData(paginationData)
+        this.$refs.paginationInfoaw.setPaginationData(paginationData)
+      },
+      onLoadingUserActivityWeek () {
+        this.onOpenIndıcator()
+      },
+      onErrorUserActivityWeek (err) {
+        this.onCloseIndıcator()
+        appPlugin.showalert(
+          'Kayıtlar Getirilirken Bir Hata Gerçekleşti Lütfen Daha Sonra Tekrar Deneyin',
+          '',
+          'error',
+          'Tamam'
+        )
+      },
+      onSuccessUserActivityWeek () {
+      },
+      onUserActivityWeekSearch (txt) {
+        this.txt = txt
+        this.$nextTick(function () {
+          this.$refs.vuetableaw.refresh()
+        })
       }
-    },
-    onLoadedUserActivityWeek() {
-      this.loading = false;
-    },
-    onChangePageActivityWeek(page) {
-      this.$refs.vuetableaw.changePage(page);
-    },
-    onPaginationDataUserActivityWeek(paginationData) {
-      this.$refs.paginationaw.setPaginationData(paginationData);
-      this.$refs.paginationInfoaw.setPaginationData(paginationData);
-    },
-    onLoadingUserActivityWeek() {
-      this.loading = true;
-    },
-    onErrorUserActivityWeek(err) {
-      this.loading = false;
-      appPlugin.showalert(
-        "Kayıtlar Getirilirken Bir Hata Gerçekleşti Lütfen Daha Sonra Tekrar Deneyin",
-        "",
-        "error",
-        "Tamam"
-      );
-    },
-    onSuccessUserActivityWeek() {},
-    onUserActivityWeekSearch(txt) {
-      this.txt = txt;
-      this.$nextTick(function() {
-        this.$refs.vuetableaw.refresh();
-      });
     }
   }
-};
 </script>
 
 <style scoped>

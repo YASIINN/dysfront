@@ -231,11 +231,13 @@
   import _ from 'underscore'
   import { FETCH_PNOTIFICATION } from '../../store/modules/pnotification/moduleNames'
   import { FETCH_USER_WITH_LESSON } from '../../store/modules/users/moduleNames'
+  import loadingMixins from '@/mixins/loading'
 
   var startdate = new Date().toISOString()
   var enddate = new Date().toISOString()
   export default {
     name: 'index',
+    mixins: [loadingMixins],
 
     created () {
       this.getPosts()
@@ -249,12 +251,12 @@
       fetchUserLesson () {
         this.$store.dispatch(FETCH_USER_WITH_LESSON, { userid: 2 }).then((res) => {
           console.log('ders', res.data[0].lessons)
-          if(res.data[0].lessons.length>0){
+          if (res.data[0].lessons.length > 0) {
             res.data[0].lessons.unshift({
-              id:0,
-              lName:"Seçiniz"
+              id: 0,
+              lName: 'Seçiniz'
             })
-           this.lessonlist=res.data[0].lessons
+            this.lessonlist = res.data[0].lessons
           }
 
         }).catch((err) => {
@@ -380,7 +382,8 @@
       },
       getPosts () {
         debugger
-        this.loading = true
+        this.onOpenIndıcator()
+
         let query = []
         let userIds = []
         debugger
@@ -408,10 +411,10 @@
             this.nextPageUrl = res.data.next_page_url
           }
           this.lastPageUrl = res.data.last_page_url
-          this.loading = false
+          this.onCloseIndıcator()
 
         }).catch((err) => {
-          this.loading = false
+          this.onCloseIndıcator()
           appPlugin.showalert(this.$t('warning'),
             this.$t('fetchError'), 'error',
             this.$t('ok'))
@@ -419,7 +422,7 @@
       },
       loadMore (type) {
         debugger
-        this.loading = true
+        this.onOpenIndıcator()
         debugger
         let lastpageUrl = ''
         let pageUrl = ''
@@ -467,15 +470,15 @@
               this.nextPageUrl = ''
             }
             debugger
-            this.loading = false
+            this.onCloseIndıcator()
           }).catch((err) => {
             debugger
-            this.loading = false
+            this.onCloseIndıcator()
             appPlugin.showalert(this.$t('warning'),
               this.$t('fetchError'), 'error',
               this.$t('ok'))
           })
-          this.loading = false
+          this.onCloseIndıcator()
         } else {
           if (this.nextPageUrl == this.lastPageUrl) {
             debugger
@@ -489,16 +492,16 @@
                 this.lastPageUrl = res.data.last_page_url
                 this.nextPageUrl = res.data.next_page_url
               }
-              this.loading = false
+              this.onCloseIndıcator()
             }).catch((err) => {
               debugger
-              this.loading = false
+              this.onCloseIndıcator()
               appPlugin.showalert(this.$t('warning'),
                 this.$t('fetchError'), 'error',
                 this.$t('ok'))
             })
             this.nextPageUrl = ''
-            this.loading = false
+            this.onCloseIndıcator()
           } else {
             debugger
             this.$store.dispatch(FETCH_NEXT_POST, {
@@ -510,15 +513,15 @@
                 debugger
                 this.nextPageUrl = res.data.next_page_url
               }
-              this.loading = false
+              this.onCloseIndıcator()
             }).catch((err) => {
               debugger
-              this.loading = false
+              this.onCloseIndıcator()
               appPlugin.showalert(this.$t('warning'),
                 this.$t('fetchError'), 'error',
                 this.$t('ok'))
             })
-            this.loading = false
+            this.onCloseIndıcator()
           }
         }
       },
@@ -537,7 +540,7 @@
             this.selectedCatVisible = false
             this.clearModel = true
             this.clearModel = false
-            this.lessonvisible=false
+            this.lessonvisible = false
             return
           case 'Ödev':
             this.fetchHomeWork()
@@ -551,7 +554,7 @@
             this.selectedCatPlaceholder = 'Ödev Türü Seçiniz'
             this.clearModel = true
             this.clearModel = false
-            this.lessonvisible=true
+            this.lessonvisible = true
 
             return
           case 'Sınav Tarihi':
@@ -565,7 +568,7 @@
             this.timeplaceholder = ''
             this.clearModel = true
             this.clearModel = false
-            this.lessonvisible=false
+            this.lessonvisible = false
 
             return
           case 'Etkinlik':
@@ -576,7 +579,7 @@
             this.inputplaceholder = ''
             this.selectedCatPlaceholder = ''
             this.timevisible = true
-            this.lessonvisible=false
+            this.lessonvisible = false
 
             this.timeplaceholder = 'Saat Seçiniz'
             return
@@ -586,7 +589,7 @@
             this.inputvisible = false
             this.datevisible = false
             this.timevisible = false
-            this.lessonvisible=false
+            this.lessonvisible = false
             this.selectedCatPlaceholder = ''
             this.dateplaceholder = ''
             this.timeplaceholder = ''
@@ -602,21 +605,21 @@
         })
       },
       fetchPostTag () {
-        this.loading = true
+        this.onOpenIndıcator()
         this.$store.dispatch(FETCH_ALL_POST_TAG).then((res) => {
-          this.loading = false
+          this.onCloseIndıcator()
           if (res.status == 200) {
           }
         }).catch((err) => {
-          this.loading = false
+          this.onCloseIndıcator()
           appPlugin.showalert(this.$t('warning'), this.$t('fetchError'), 'error', this.$t('ok'))
         })
       },
 
       fetchPostType () {
-        this.loading = true
+        this.onOpenIndıcator()
         this.$store.dispatch(FETCH_ALL_POST_TYPE).then((res) => {
-          this.loading = false
+          this.onCloseIndıcator()
           if (res) {
             console.log('res', res)
             this.currentTabItem = res[0]
@@ -628,7 +631,7 @@
           }
 
         }).catch((err) => {
-          this.loading = false
+          this.onCloseIndıcator()
           appPlugin.showalert(this.$t('warning'), this.$t('fetchError'), 'error', this.$t('ok'))
         })
       }
@@ -658,13 +661,12 @@
         selectedCatPlaceholder: '',
         timeplaceholder: '',
         dateplaceholder: '',
-        loading: false,
         currentTab: 1,
         currentTabItem: '',
         selectedCatVisible: false,
         clearModel: false,
         paginateTo: 0,
-        lessonlist:[]
+        lessonlist: []
       }
     },
     components: {

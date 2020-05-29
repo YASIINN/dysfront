@@ -64,7 +64,10 @@
     VuetablePaginationInfo,
     appPlugin
   } from '@/Providers/defaultImports'
+  import loadingMixins from '@/mixins/loading'
+
   export default {
+    mixins: [loadingMixins],
     props: {
       header: {}
     },
@@ -78,7 +81,7 @@
         this.selectedDays.forEach((day) => {
           day.sptypeid = this.$route.params.id
         })
-        this.loading = true
+        this.onOpenIndıcator()
         this.$store.dispatch('createSchoolDays', { daysList: this.selectedDays }).then((res) => {
           appPlugin.showalert(
             this.$t('succescreatemessage'),
@@ -95,8 +98,7 @@
             this.$t('ok')
           )
         })
-
-        this.loading = false
+        this.onCloseIndıcator()
       },
       onTouch () {
         this.isTouched = true
@@ -107,7 +109,6 @@
       return {
         allDays: days,
         selectedDays: days,
-        loading: false,
         isTouched: false
       }
     },

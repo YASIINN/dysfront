@@ -51,7 +51,6 @@
         </div>
       </div>
     </flex-card>
-
     <flex column="col-md-12 col-sm-12 col-lg-12">
       <div class="card">
         <div class="card-header border-0">
@@ -115,35 +114,16 @@
 
 <script>
   import {
-    SearchBox,
-    Loading,
-    FlexCard,
-    Flex,
-    VButton,
     required,
-    VInput,
-    VTooltipButton,
-    Vuetable,
     Swal,
-    VuetablePaginationBootstrap,
-    VuetablePaginationInfo,
     appPlugin
   } from '@/Providers/defaultImports'
+  import loadingMixins from '@/mixins/loading'
+  import vuetableMixins from '@/mixins/vuetable'
+  import defaulcomponentsMixins from '@/mixins/defaultcomponents'
 
   export default {
     name: 'index',
-    components: {
-      SearchBox,
-      FlexCard,
-      Flex,
-      Loading,
-      VInput,
-      VButton,
-      VTooltipButton,
-      Vuetable,
-      VuetablePaginationBootstrap,
-      VuetablePaginationInfo
-    },
     validations: {
       companyData: {
         name: {
@@ -151,42 +131,15 @@
         }
       }
     },
+    mixins: [loadingMixins, vuetableMixins, defaulcomponentsMixins],
     data () {
       return {
-        currentData: [],
-        moreParams: {},
-        txt: '',
-        loading: false,
-        dataselected: false,
         companyData: {
           name: ''
         },
-        selectedData: {}
       }
     },
-
-    created () {
-    },
     methods: {
-      onChangePage (page) {
-        this.$refs.vuetable.changePage(page)
-      },
-      onPaginationData (paginationData) {
-        this.$refs.pagination.setPaginationData(paginationData)
-        this.$refs.paginationInfo.setPaginationData(paginationData)
-      },
-      onLoading () {
-        this.loading = true
-      },
-      onLoaded () {
-        this.loading = false
-      },
-      onSearchHandler (txt) {
-        this.txt = txt
-        this.$nextTick(function () {
-          this.$refs.vuetable.refresh()
-        })
-      },
       onDelete (item, i) {
         Swal.fire({
           title: 'Firma Adı :' + ' ' + item.cName + '\n ' + this.$t('sureDelete'),
@@ -197,7 +150,7 @@
           showCancelButton: true
         }).then(res => {
           if (res.value) {
-            this.loading = true
+            this.onOpenIndıcator()
             this.$store
               .dispatch('deleteCompanies', {
                 deleted: item,
@@ -223,7 +176,7 @@
                 }
 
                 this.onRefreshTableContent()
-                this.loading = false
+                this.onCloseIndıcator()
               })
           }
         })
@@ -251,15 +204,6 @@
           name: ''
         }
       },
-      onError () {
-        this.loading = false
-        appPlugin.showalert(
-          this.$t('getRecordErro'),
-          '',
-          'error',
-          this.$t('ok')
-        )
-      },
       onUpdate () {
         if (this.$v.companyData.name.$invalid) {
           appPlugin.showalert(
@@ -269,7 +213,7 @@
             this.$t('ok')
           )
         } else {
-          this.loading = true
+          this.onOpenIndıcator()
           this.$store.dispatch('updateCompanies', this.companyData).then(res => {
             if (res.status) {
               if (res.status === 200) {
@@ -290,17 +234,10 @@
             }
 
             this.onRefreshTableContent()
-            this.loading = false
+            this.onCloseIndıcator()
             this.onResetData()
           })
         }
-      },
-      onSuccess () {
-        /* succesFetchDataApi */
-      },
-      onCancel () {
-        this.dataselected = !this.dataselected
-        this.onResetData()
       },
       onSelectData (data) {
         this.dataselected = true
@@ -308,9 +245,6 @@
           name: data.cName,
           id: data.id
         }
-      },
-      onRefreshTableContent () {
-        this.$refs.vuetable.reload()
       },
       onFetchApi (apiUrl, httpOptions) {
         var data
@@ -320,7 +254,6 @@
             query: appPlugin.urlParse('cName%' + this.txt)
           })
           data.then(res => {
-            console.log('lalal', res)
             this.currentData = res
           })
           return data
@@ -343,7 +276,7 @@
             this.$t('ok')
           )
         } else {
-          this.loading = true
+          this.onOpenIndıcator()
           let data = {
             created: this.companyData,
             urlparse: appPlugin.urlParse('cName=' + this.companyData.name)
@@ -371,7 +304,7 @@
             }
 
             this.onRefreshTableContent()
-            this.loading = false
+            this.onCloseIndıcator()
           })
         }
       }

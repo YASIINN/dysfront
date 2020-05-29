@@ -41,7 +41,8 @@
       iconName="fa fa-check-circle"
       v-if="showalert"
       @onClose="onCloseAlert($event)"
-    >Ders Programı Oluşturabilmek İçin Sistem Gün ve Saat Kaydı Girimelidir.</alert-box>
+    >Ders Programı Oluşturabilmek İçin Sistem Gün ve Saat Kaydı Girimelidir.
+    </alert-box>
     <flex-card column="col-lg-12" v-show="!isInvalid">
       <div class="card-body">
         <div>
@@ -62,121 +63,124 @@
 </template>
 
 <script>
-import {
-  Swal,
-  SearchBox,
-  Loading,
-  VSelect,
-  AlertBox,
-  FlexCard,
-  Flex,
-  VButton,
-  VTabs,
-  VTabContent,
-  Multiselect,
-  VTooltipButton,
-  Vuetable,
-  VuetablePaginationBootstrap,
-  VuetablePaginationInfo,
-  appPlugin
-} from "@/Providers/defaultImports";
-import Createprogramtable from "./createprogramtable";
-
-export default {
-  name: "createschoolprogram",
-  watch: {
-    school(val) {
-      this.fetchSchoolClassBranch();
-    },
-    onreset(val) {
-      if (val == true) {
-        this.selectedClass = [];
-      }
-    }
-  },
-  data() {
-    return {
-      showalert: false,
-      ontouch: false,
-      selectedClass: [],
-      clasbranches: [],
-      loading: false
-    };
-  },
-  created() {
-    this.fetchSchoolClassBranch();
-    if (
-      this.$store.getters.getSchoolDays.length < 1 ||
-      this.$store.getters.getSchoolHour.length < 1
-    ) {
-      this.showalert = true;
-    }
-  },
-  computed: {
-    isInvalid() {
-      return this.selectedClass.clases_id == undefined;
-    }
-  },
-  props: {
-    onreset: {},
-    showVisible: {},
-    school: {},
-    header: {}
-  },
-  methods: {
-    onCloseAlert() {
-      this.showalert = false;
-    },
-    onChangeClass(data) {},
-    onTouch() {
-      this.ontouch = true;
-    },
-
-    fetchSchoolClassBranch() {
-      /* alert(this.school.schoolid)*/
-      this.loading = true;
-      this.$store
-        .dispatch("fetchSchoolClasesBranchesPivotAll", {
-          urlparse: appPlugin.urlParse("school_id=" + this.school.schoolid)
-        })
-        .then(res => {
-          this.loading = false;
-          if (res.status == 200 && res.data.length > 0) {
-            res.data.forEach(item => {
-              item.scbranch = item.cName + " " + item.bName;
-            });
-            this.clasbranches = res.data;
-          }
-        })
-        .catch(err => {
-          this.loading = false;
-          appPlugin.showalert(
-            "Uyarı",
-            "Beklenmeyen Bir Hata Gerçekleşti Lütfen Daha Sonra Tekrar Deneyin",
-            "info",
-            "Tamam"
-          );
-        });
-    }
-  },
-  components: {
-    Createprogramtable,
-    AlertBox,
-    Multiselect,
-    VSelect,
-    VTabs,
-    FlexCard,
-    Flex,
-    VTabContent,
+  import {
+    Swal,
     SearchBox,
     Loading,
+    VSelect,
+    AlertBox,
+    FlexCard,
+    Flex,
     VButton,
+    VTabs,
+    VTabContent,
+    Multiselect,
     VTooltipButton,
     Vuetable,
     VuetablePaginationBootstrap,
-    VuetablePaginationInfo
+    VuetablePaginationInfo,
+    appPlugin
+  } from '@/Providers/defaultImports'
+  import Createprogramtable from './createprogramtable'
+  import loadingMixins from '@/mixins/loading'
+
+  export default {
+    mixins: [loadingMixins],
+    name: 'createschoolprogram',
+    watch: {
+      school (val) {
+        this.fetchSchoolClassBranch()
+      },
+      onreset (val) {
+        if (val == true) {
+          this.selectedClass = []
+        }
+      }
+    },
+    data () {
+      return {
+        showalert: false,
+        ontouch: false,
+        selectedClass: [],
+        clasbranches: [],
+      }
+    },
+    created () {
+      this.fetchSchoolClassBranch()
+      if (
+        this.$store.getters.getSchoolDays.length < 1 ||
+        this.$store.getters.getSchoolHour.length < 1
+      ) {
+        this.showalert = true
+      }
+    },
+    computed: {
+      isInvalid () {
+        return this.selectedClass.clases_id == undefined
+      }
+    },
+    props: {
+      onreset: {},
+      showVisible: {},
+      school: {},
+      header: {}
+    },
+    methods: {
+      onCloseAlert () {
+        this.showalert = false
+      },
+      onChangeClass (data) {
+      },
+      onTouch () {
+        this.ontouch = true
+      },
+
+      fetchSchoolClassBranch () {
+        /* alert(this.school.schoolid)*/
+        this.onOpenIndıcator()
+
+        this.$store
+          .dispatch('fetchSchoolClasesBranchesPivotAll', {
+            urlparse: appPlugin.urlParse('school_id=' + this.school.schoolid)
+          })
+          .then(res => {
+            this.onCloseIndıcator()
+            if (res.status == 200 && res.data.length > 0) {
+              res.data.forEach(item => {
+                item.scbranch = item.cName + ' ' + item.bName
+              })
+              this.clasbranches = res.data
+            }
+          })
+          .catch(err => {
+            this.onCloseIndıcator()
+            appPlugin.showalert(
+              'Uyarı',
+              'Beklenmeyen Bir Hata Gerçekleşti Lütfen Daha Sonra Tekrar Deneyin',
+              'info',
+              'Tamam'
+            )
+          })
+      }
+    },
+    components: {
+      Createprogramtable,
+      AlertBox,
+      Multiselect,
+      VSelect,
+      VTabs,
+      FlexCard,
+      Flex,
+      VTabContent,
+      SearchBox,
+      Loading,
+      VButton,
+      VTooltipButton,
+      Vuetable,
+      VuetablePaginationBootstrap,
+      VuetablePaginationInfo
+    }
   }
-};
 </script>
 
 <style scoped></style>

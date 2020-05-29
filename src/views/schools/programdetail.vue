@@ -105,125 +105,7 @@
 </template>
 
 <script>
-import {
-  VTabs,
-  VTabContent,
-  SearchBox,
-  Loading,
-  FlexCard,
-  Flex,
-  VTooltipButton,
-  Vuetable,
-  VuetablePaginationBootstrap,
-  VuetablePaginationInfo,
-  appPlugin
-} from "@/Providers/defaultImports";
-import Createday from "./partial/createday";
-import Schooldaylist from "./partial/schooldaylist";
-import Createhour from "./partial/createhour";
-import Schoolhourlist from "./partial/schoolhourlist";
-import Createschoolprogram from "./partial/createschoolprogram";
-import SchoolPersonProgram from "./partial/showpersonprogram";
-
-export default {
-  data() {
-    return {
-      createdays: true,
-      createhours: true,
-      createprogram: false,
-      showprogram: false,
-      getprogramtype: [],
-      showSelectedData: {},
-      onreset: false,
-      onresetshowcontent: false,
-      onresetschoolhours: false,
-      onresetschooldays: false,
-      refreshcontent: false,
-      loading: false
-    };
-  },
-  watch: {
-    onresetschooldays: function(val) {}
-  },
-  name: "programdetail",
-  created() {
-    if (isNaN(+this.$route.params.id) == false) {
-      this.showSchoolProgramData();
-    } else {
-      this.loading = false;
-      appPlugin.showalert("Geçersiz Parametre", "", "error", "Tamam");
-      this.$router.replace("/programs");
-    }
-  },
-  methods: {
-    onSelectedData(data) {
-      this.showSelectedData = data;
-    },
-    getActiveTabs(data) {
-      switch (data.componentOptions.propsData.tabKey) {
-        case "schoolDay":
-          this.createdays = true;
-          this.createhours = true;
-          this.createprogram = false;
-          this.showprogram = false;
-          this.refreshcontent = true;
-          this.onresetshowcontent = true;
-          return;
-        case "schoolHour":
-          this.createdays = false;
-          this.createhours = true;
-          this.createprogram = false;
-          this.showprogram = false;
-          this.refreshcontent = true;
-          this.onresetshowcontent = true;
-          return;
-        case "schoolProgram":
-          this.createdays = false;
-          this.createhours = false;
-          this.createprogram = true;
-          this.showprogram = false;
-          this.refreshcontent = false;
-          this.onresetshowcontent = true;
-          /*  this.showSchoolProgramData()*/
-          return;
-        case "showSchoolProgram":
-          this.createdays = false;
-          this.createhours = false;
-          this.createprogram = false;
-          this.showprogram = true;
-          this.refreshcontent = true;
-          this.onresetshowcontent = false;
-          return;
-      }
-    },
-    onCreateHourComplate($event) {
-      this.onresetschoolhours = $event;
-    },
-    onRefreshComplate($event) {
-      this.onresetschooldays = $event;
-    },
-    showSchoolProgramData() {
-      this.loading = true;
-      this.$store
-        .dispatch("showSchoolProgramType", { id: this.$route.params.id })
-        .then(res => {
-          if (res[0] && res[0].id) {
-            console.log(res);
-            this.getprogramtype = res;
-          } else {
-            this.$router.replace("/programs");
-          }
-        });
-      this.loading = false;
-    }
-  },
-  components: {
-    SchoolPersonProgram,
-    Createschoolprogram,
-    Schoolhourlist,
-    Createhour,
-    Schooldaylist,
-    Createday,
+  import {
     VTabs,
     VTabContent,
     SearchBox,
@@ -233,9 +115,129 @@ export default {
     VTooltipButton,
     Vuetable,
     VuetablePaginationBootstrap,
-    VuetablePaginationInfo
+    VuetablePaginationInfo,
+    appPlugin
+  } from '@/Providers/defaultImports'
+  import Createday from './partial/createday'
+  import Schooldaylist from './partial/schooldaylist'
+  import Createhour from './partial/createhour'
+  import Schoolhourlist from './partial/schoolhourlist'
+  import Createschoolprogram from './partial/createschoolprogram'
+  import SchoolPersonProgram from './partial/showpersonprogram'
+  import loadingMixins from '@/mixins/loading'
+
+  export default {
+    mixins: [loadingMixins],
+    data () {
+      return {
+        createdays: true,
+        createhours: true,
+        createprogram: false,
+        showprogram: false,
+        getprogramtype: [],
+        showSelectedData: {},
+        onreset: false,
+        onresetshowcontent: false,
+        onresetschoolhours: false,
+        onresetschooldays: false,
+        refreshcontent: false,
+      }
+    },
+    watch: {
+      onresetschooldays: function (val) {
+      }
+    },
+    name: 'programdetail',
+    created () {
+      if (isNaN(+this.$route.params.id) == false) {
+        this.showSchoolProgramData()
+      } else {
+        this.onCloseIndıcator()
+        appPlugin.showalert('Geçersiz Parametre', '', 'error', 'Tamam')
+        this.$router.replace('/programs')
+      }
+    },
+    methods: {
+      onSelectedData (data) {
+        this.showSelectedData = data
+      },
+      getActiveTabs (data) {
+        switch (data.componentOptions.propsData.tabKey) {
+          case 'schoolDay':
+            this.createdays = true
+            this.createhours = true
+            this.createprogram = false
+            this.showprogram = false
+            this.refreshcontent = true
+            this.onresetshowcontent = true
+            return
+          case 'schoolHour':
+            this.createdays = false
+            this.createhours = true
+            this.createprogram = false
+            this.showprogram = false
+            this.refreshcontent = true
+            this.onresetshowcontent = true
+            return
+          case 'schoolProgram':
+            this.createdays = false
+            this.createhours = false
+            this.createprogram = true
+            this.showprogram = false
+            this.refreshcontent = false
+            this.onresetshowcontent = true
+            /*  this.showSchoolProgramData()*/
+            return
+          case 'showSchoolProgram':
+            this.createdays = false
+            this.createhours = false
+            this.createprogram = false
+            this.showprogram = true
+            this.refreshcontent = true
+            this.onresetshowcontent = false
+            return
+        }
+      },
+      onCreateHourComplate ($event) {
+        this.onresetschoolhours = $event
+      },
+      onRefreshComplate ($event) {
+        this.onresetschooldays = $event
+      },
+      showSchoolProgramData () {
+        this.onOpenIndıcator()
+        this.$store
+          .dispatch('showSchoolProgramType', { id: this.$route.params.id })
+          .then(res => {
+            if (res[0] && res[0].id) {
+              console.log(res)
+              this.getprogramtype = res
+            } else {
+              this.$router.replace('/programs')
+            }
+          })
+        this.onCloseIndıcator()
+      }
+    },
+    components: {
+      SchoolPersonProgram,
+      Createschoolprogram,
+      Schoolhourlist,
+      Createhour,
+      Schooldaylist,
+      Createday,
+      VTabs,
+      VTabContent,
+      SearchBox,
+      Loading,
+      FlexCard,
+      Flex,
+      VTooltipButton,
+      Vuetable,
+      VuetablePaginationBootstrap,
+      VuetablePaginationInfo
+    }
   }
-};
 </script>
 
 <style scoped></style>

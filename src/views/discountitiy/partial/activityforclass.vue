@@ -161,6 +161,7 @@
 
   import moment from 'moment'
   import { Datetime } from 'vue-datetime'
+  import loadingMixins from '@/mixins/loading'
 
   export default {
     name: 'activityforclass',
@@ -179,7 +180,6 @@
     },
     data () {
       return {
-        loading: false,
         selectedptype: 1,
         today: '',
         selectedActivity: '',
@@ -189,10 +189,12 @@
         selecteddtype: { id: 0, dtName: 'Tümü' },
       }
     },
+    mixins: [loadingMixins],
     methods: {
       onChangeDType (item, i, k, dtype) {
         //ptype
-        this.loading = true
+        this.onOpenIndıcator()
+
         let today = moment(this.today).format('YYYY-MM-DD')
         this.$store.dispatch(FETCH_GETSTUDENTS_DISCONTS_GP, {
           day: today,
@@ -212,9 +214,9 @@
             }
           }
           this.dstudentlist = res.data
-          this.loading = false
+          this.onCloseIndıcator()
         }).catch((err) => {
-          this.loading = false
+          this.onCloseIndıcator()
           appPlugin.showalert(this.$t('warning'), this.$t('getRecordErro'), 'error', this.$t('ok'))
         })
       },
@@ -222,14 +224,14 @@
         debugger
         this.$store.commit(SET_ACTIVITY_GRADERS_DP, [])
         this.selectedgroups = ''
-        this.loading = true
+        this.onOpenIndıcator()
         this.$store.dispatch(FETCH_ACTIVITY_GRADES_DP, {
           actid: this.selectedActivity.id,
           perid: data.id
         }).then((res) => {
-          this.loading = false
+          this.onCloseIndıcator()
         }).catch((err) => {
-          this.loading = false
+          this.onCloseIndıcator()
           appPlugin.showalert(this.$t('warning'), this.$t('getRecordErro', 'eror', this.$t('ok')))
         })
       },
@@ -261,9 +263,9 @@
               }
               this.dstudentlist = res.data
             }
-            this.loading = false
+            this.onCloseIndıcator()
           }).catch((err) => {
-            this.loading = false
+            this.onCloseIndıcator()
             appPlugin.showalert(this.$t('warning'), this.$t('getRecordErro', 'eror', this.$t('ok')))
           })
 
@@ -275,36 +277,36 @@
         this.$store.commit(SET_ACTIVITY_GRADERS_DP, [])
         this.selectedgroups = ''
         this.selectedperiods = ''
-        this.loading = true
+        this.onOpenIndıcator()
         this.$store.dispatch(FETCH_ACTIVITY_GRADES_D, { id: data.id }).then((res) => {
-          this.loading = false
+          this.onCloseIndıcator()
         }).catch((err) => {
-          this.loading = false
+          this.onCloseIndıcator()
           appPlugin.showalert(this.$t('warning'), this.$t('getRecordErro', 'eror', this.$t('ok')))
         })
       }
     },
 
     created () {
-      this.loading = true
+      this.onOpenIndıcator()
       this.$store.dispatch(FETCH_DTYPE).then((res) => {
-        this.loading = false
+        this.onCloseIndıcator()
         res.data.unshift({ id: 0, dtName: 'Tümü' })
         this.dtypes = res.data
       }).catch((err) => {
-        this.loading = false
+        this.onCloseIndıcator()
         appPlugin.showalert(this.$t('warning'), this.$t('getRecordErro', 'eror', this.$t('ok')))
       })
       this.$store.dispatch('fetchActivities').then((res) => {
-        this.loading = false
+        this.onCloseIndıcator()
       }).catch((err) => {
-        this.loading = false
+        this.onCloseIndıcator()
         appPlugin.showalert(this.$t('warning'), this.$t('getRecordErro', 'eror', this.$t('ok')))
       })
       this.$store.dispatch(FETCH_SCHOOL_P_TYPE).then((res) => {
-        this.loading = false
+        this.onCloseIndıcator()
       }).catch((err) => {
-        this.loading = false
+        this.onCloseIndıcator()
         appPlugin.showalert(this.$t('warning'), this.$t('getRecordErro', 'eror', this.$t('ok')))
       })
     }

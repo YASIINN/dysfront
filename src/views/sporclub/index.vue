@@ -86,7 +86,7 @@
           class="alert-secondary"
           iconName="fa fa-check-circle"
           v-if="showAlert"
-          @onClose="onCloseAlert($event)"
+          @onClose="showAlert=false"
         >
           Sisteme Spor Kulübü Ekleyebilmek İçin Sisteme Firma Kayıt Edilmelidir. Eklemek İçin
           <router-link tag="a" target="_blank" :to="'/company'">Buraya Tıklayın.</router-link>
@@ -186,13 +186,15 @@
     DELETE_SPOR_CLUB,
     FETCH__ALL_SPOR_CLUB
   } from '@/store/modules/sporclub/moduleNames'
+  import loadingMixins from '@/mixins/loading'
 
   export default {
+    mixins: [loadingMixins],
     name: 'index',
     created () {
-      this.loading = true
+      this.onOpenIndıcator()
       this.$store.dispatch('fetchAllCompanies').then(res => {
-        this.loading = false
+        this.onCloseIndıcator()
         if (res.data.length < 1) {
           this.showAlert = true
         }
@@ -251,7 +253,7 @@
           showCancelButton: true
         }).then(res => {
           if (res.value) {
-            this.loading = true
+            this.onOpenIndıcator()
             this.$store
               .dispatch(DELETE_SPOR_CLUB, {
                 deleted: item,
@@ -276,13 +278,13 @@
                   )
                 }
                 this.onRefreshTableContent()
-                this.loading = false
+                this.onCloseIndıcator()
               })
           }
         })
       },
       onError (err) {
-        this.loading = false
+        this.onCloseIndıcator()
         appPlugin.showalert(this.$t('getRecordErro'), '', 'error', this.$t('ok'))
       },
       onChangePage (page) {
@@ -293,10 +295,10 @@
         this.$refs.paginationInfo.setPaginationData(paginationData)
       },
       onLoading () {
-        this.loading = true
+        this.onOpenIndıcator()
       },
       onLoaded () {
-        this.loading = false
+        this.onCloseIndıcator()
       },
       onRefreshTableContent () {
         this.$refs.vuetable.reload()
@@ -351,7 +353,7 @@
             this.$t('ok')
           )
         } else {
-          this.loading = true
+          this.onOpenIndıcator()
 
           let data = {
             updated: this.sporClubData
@@ -383,7 +385,7 @@
               )
             }
             this.onRefreshTableContent()
-            this.loading = false
+            this.onCloseIndıcator()
             this.onResetData()
           })
         }
@@ -420,7 +422,7 @@
             this.$t('ok')
           )
         } else {
-          this.loading = true
+          this.onOpenIndıcator()
           let data = {
             code: this.sporClubData.code,
             name: this.sporClubData.name,
@@ -453,13 +455,10 @@
               )
             }
             this.onRefreshTableContent()
-            this.loading = false
+            this.onCloseIndıcator()
           })
         }
       },
-      onCloseAlert (event) {
-        this.showAlert = false
-      }
     },
     validations: {
       sporClubData: {
@@ -492,7 +491,6 @@
         currentData: [],
         moreParams: {},
         txt: '',
-        loading: false,
         dataselected: false,
         sporClubData: {
           name: '',

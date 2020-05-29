@@ -103,16 +103,18 @@
     Swal,
     appPlugin
   } from '@/Providers/defaultImports'
-  import { Colors } from '../../Providers/appConstants'
+  import { Colors } from '@/Providers/appConstants'
   import {
     CREATE_POST_TAG,
     DELETE_POST_TAG,
     FETCH_ALL_POST_TAG,
     UPDATE_POST_TAG
-  } from '../../store/modules/posttag/moduleNames'
+  } from '@/store/modules/posttag/moduleNames'
+  import loadingMixins from '@/mixins/loading'
 
   export default {
     name: 'index',
+    mixins: [loadingMixins],
     created () {
       this.getPostTags()
     },
@@ -132,7 +134,7 @@
         } else if (this.posttagData.tagname.trim() == '') {
           appPlugin.showalert(this.$t('warning'), 'Lütfen Etiket Adı Giriniz', 'info', this.$t('ok'))
         } else {
-          this.loading = true
+          this.onOpenIndıcator()
           this.$store.dispatch(UPDATE_POST_TAG, {
             id: this.posttagData.id,
             color: this.posttagData.color,
@@ -148,9 +150,9 @@
               color: '',
               tagname: ''
             }
-            this.loading = false
+            this.onCloseIndıcator()
           }).catch((err) => {
-            this.loading = false
+            this.onCloseIndıcator()
             appPlugin.showalert(this.$t('warning'), this.$t('updateErrorMsg'), 'error', this.$t('ok'))
           })
         }
@@ -161,7 +163,7 @@
         } else if (this.posttagData.tagname.trim() == '') {
           appPlugin.showalert(this.$t('warning'), 'Lütfen Etiket Adı Giriniz', 'info', this.$t('ok'))
         } else {
-          this.loading = true
+          this.onOpenIndıcator()
           this.$store.dispatch(CREATE_POST_TAG, {
             color: this.posttagData.color,
             tagname: this.posttagData.tagname
@@ -176,9 +178,9 @@
               color: '',
               tagname: ''
             }
-            this.loading = false
+            this.onCloseIndıcator()
           }).catch((err) => {
-            this.loading = false
+            this.onCloseIndıcator()
             appPlugin.showalert(this.$t('warning'), this.$t('errorcreatemessage'), 'error', this.$t('ok'))
           })
         }
@@ -195,7 +197,7 @@
           showCancelButton: true
         }).then(res => {
           if (res.value) {
-            this.loading = true
+            this.onOpenIndıcator()
 
             this.$store
               .dispatch(DELETE_POST_TAG, {
@@ -221,7 +223,7 @@
                   )
                 }
 
-                this.loading = false
+                this.onCloseIndıcator()
               })
           }
         })
@@ -236,13 +238,13 @@
         }
       },
       getPostTags () {
-        this.loading = true
+        this.onOpenIndıcator()
         this.$store.dispatch(FETCH_ALL_POST_TAG).then((res) => {
-          this.loading = false
+          this.onCloseIndıcator()
           if (res.status == 200) {
           }
         }).catch((err) => {
-          this.loading = false
+          this.onCloseIndıcator()
           appPlugin.showalert(this.$t('warning'), this.$t('fetchError'), 'error', this.$t('ok'))
         })
 
@@ -251,7 +253,6 @@
     data () {
       return {
         dataselected: false,
-        loading: false,
         posttagData: {
           id: '',
           color: '',

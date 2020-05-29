@@ -25,6 +25,7 @@
   import Loading from '@/components/loading'
   import VTable from '@/components/table'
   import { appPlugin, Swal } from '@/Providers/defaultImports'
+  import loadingMixins from '@/mixins/loading'
 
   export default {
     watch: {
@@ -34,6 +35,7 @@
         }
       }
     },
+    mixins: [loadingMixins],
     components: {
       VTable,
       Loading
@@ -49,9 +51,7 @@
       onreset: {}
     },
     data () {
-      return {
-        loading: false
-      }
+      return {}
     },
     created () {
       this.onFetchApi()
@@ -71,7 +71,8 @@
           showCancelButton: true
         }).then(res => {
           if (res.value) {
-            this.loading = true
+
+            this.onOpenIndıcator()
 
             this.$store
               .dispatch('deleteSchoolHours', {
@@ -97,7 +98,7 @@
                   )
                 }
 
-                this.loading = false
+                this.onCloseIndıcator()
               })
           }
         })
@@ -109,13 +110,13 @@
       },
 
       async onFetchApi () {
-        this.loading = true
+        this.onOpenIndıcator()
         await this.$store.dispatch('fetchSchoolHours', {
           urlparse: appPlugin.urlParse(
             'school_p_type_id=' + this.$route.params.id
           )
         })
-        this.loading = false
+        this.onCloseIndıcator()
       }
     }
   }

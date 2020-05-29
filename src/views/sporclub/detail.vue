@@ -68,8 +68,10 @@
   import personlist from './partial/sporclubpersonlist'
   import sporclubstudentslist from './partial/sporclubstudentslist'
   import assignstudent from '../students/assignstudent'
+  import loadingMixins from '@/mixins/loading'
 
   export default {
+    mixins: [loadingMixins],
     watch: {
       teambranchreset: function (val) {
       },
@@ -80,7 +82,7 @@
     },
     created () {
       if (isNaN(+this.$route.params.id) == false) {
-        this.loading = true
+        this.onOpenIndıcator()
         this.$store
           .dispatch(SHOW_SPOR_CLUB, { id: this.$route.params.id })
           .then(res => {
@@ -88,13 +90,14 @@
               this.$router.replace('/sporclub')
             } else {
               if (res) {
-                this.loading = false
+
+                this.onCloseIndıcator()
                 this.sporClub = res
               }
             }
           })
           .catch(err => {
-            this.loading = false
+            this.onCloseIndıcator()
           })
       } else {
         appPlugin.showalert(this.$t('invalidparam'), '', 'error', this.$t('ok'))
@@ -151,7 +154,6 @@
         studentreset: false,
         clubpersonreset: false,
         teambranchreset: false,
-        loading: false
       }
     },
     components: {

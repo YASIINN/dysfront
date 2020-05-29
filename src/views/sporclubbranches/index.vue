@@ -154,8 +154,10 @@
     DELETE_SC_BRANCHES,
     FETCH_ALL_SC_BRANCHES
   } from '@/store/modules/teambranch/moduleNames'
+  import loadingMixins from '@/mixins/loading'
 
   export default {
+    mixins: [loadingMixins],
     name: 'index',
     components: {
       SearchBox,
@@ -189,9 +191,10 @@
         }
       },
       exportallData () {
-        this.loading = true
+        this.onOpenIndıcator()
         this.$store.dispatch(FETCH_ALL_SC_BRANCHES).then((res) => {
-          this.loading = false
+
+          this.onCloseIndıcator()
           if (res.length > 0) {
             let data = res
             let keys = ['sbCode', 'sbName']
@@ -206,7 +209,7 @@
             )
           }
         }).catch((err) => {
-          this.loading = false
+          this.onCloseIndıcator()
         })
       },
       onChangePage (page) {
@@ -217,10 +220,10 @@
         this.$refs.paginationInfo.setPaginationData(paginationData)
       },
       onLoading () {
-        this.loading = true
+        this.onOpenIndıcator()
       },
       onLoaded () {
-        this.loading = false
+        this.onCloseIndıcator()
       },
       onSearchHandler (txt) {
         this.txt = txt
@@ -238,7 +241,7 @@
           showCancelButton: true
         }).then(res => {
           if (res.value) {
-            this.loading = true
+            this.onOpenIndıcator()
             this.$store
               .dispatch(DELETE_SC_BRANCHES, {
                 deleted: item,
@@ -264,14 +267,14 @@
                 }
 
                 this.onRefreshTableContent()
-                this.loading = false
+                this.onCloseIndıcator()
               })
           }
         })
       },
       onError (err) {
 
-        this.loading = false
+        this.onCloseIndıcator()
         appPlugin.showalert(this.$t('fetchError'), '', 'error', this.$t('ok'))
       },
       onUpdate () {
@@ -290,7 +293,7 @@
             this.$t('ok')
           )
         } else {
-          this.loading = true
+          this.onOpenIndıcator()
           this.$store.dispatch(UPDATE_SC_BRANCHES, this.scbranchData).then(res => {
             if (res.status) {
               if (res.status === 200) {
@@ -317,7 +320,7 @@
               )
             }
             this.onRefreshTableContent()
-            this.loading = false
+            this.onCloseIndıcator()
             this.onResetData()
           })
         }
@@ -393,7 +396,7 @@
             this.$t('ok')
           )
         } else {
-          this.loading = true
+          this.onOpenIndıcator()
           this.$store.dispatch(CREATE_SC_BRANCHES, this.scbranchData,).then(res => {
             if (res.status === 200) {
               appPlugin.showalert(
@@ -419,7 +422,7 @@
               )
             }
             this.onRefreshTableContent()
-            this.loading = false
+            this.onCloseIndıcator()
           })
         }
       }
@@ -429,7 +432,6 @@
         currentData: [],
         moreParams: {},
         txt: '',
-        loading: false,
         dataselected: false,
         scbranchData: {
           name: '',

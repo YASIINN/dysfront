@@ -228,8 +228,10 @@
   import { CREATE_POST, DELETE_POST } from '../../../store/modules/post/moduleNames'
   import { ADD_MULTIPLE_FILES } from '../../../store/modules/file/moduleNames'
   import { FETCH_ALL_USER_AND_STUDENT, FETCH_USER_WITH_LESSON } from '../../../store/modules/users/moduleNames'
+  import loadingMixins from '@/mixins/loading'
 
   export default {
+    mixins: [loadingMixins],
     components: { Datetime, VueTimepicker, VInput, VButton, VSelect, Multiselect, Loading },
     name: 'post',
     props: {
@@ -331,7 +333,8 @@
                       type: 'success',
                       position: 'bottom'
                     })
-                    this.loading = false
+
+                    this.onCloseIndıcator()
                     this.post = {
                       tag: 0,
                       filesize: 0,
@@ -340,7 +343,7 @@
                       inputText: '',
                       postDate: '',
                       postTime: '',
-                      lessonid:0,
+                      lessonid: 0,
                       selectedCat: 0,
                       iscommentable: true,
                     }
@@ -353,13 +356,13 @@
                     fileInput.value = ''
                     this.$emit('onCreated')
                   }).catch((err) => {
-                    this.loading = false
+                    this.onCloseIndıcator()
                     appPlugin.showalert(this.$t('warning'), 'Gönderi Paylaşılırken Hata', 'error', this.$t('ok'))
                   })
                   let fileInput = document.getElementById('postFile')
                 }).catch((err) => {
                   debugger
-                  this.loading = false
+                  this.onCloseIndıcator()
                 })
 
               } else {
@@ -379,7 +382,7 @@
                       type: 'success',
                       position: 'bottom'
                     })
-                    this.loading = false
+                    this.onCloseIndıcator()
                     this.post = {
                       tag: 0,
                       filesize: 0,
@@ -388,7 +391,7 @@
                       inputText: '',
                       postDate: '',
                       postTime: '',
-                      lessonid:0,
+                      lessonid: 0,
                       selectedCat: 0,
                       iscommentable: true,
                     }
@@ -402,7 +405,7 @@
                     this.$emit('onCreated')
                   }
                 }).catch((err) => {
-                  this.loading = false
+                  this.onCloseIndıcator()
                   appPlugin.showalert(this.$t('warning'), 'Gönderi Paylaşılırken Hata', 'error', this.$t('ok'))
                 })
                 let fileInput = document.getElementById('postFile')
@@ -486,9 +489,9 @@
                         type: 'success',
                         position: 'bottom'
                       })
-                      this.loading = false
+                      this.onCloseIndıcator()
                       this.post = {
-                        lessonid:0,
+                        lessonid: 0,
                         tag: 0,
                         filesize: 0,
                         fileList: [],
@@ -510,13 +513,13 @@
                     }
 
                   }).catch((err) => {
-                    this.loading = false
+                    this.onCloseIndıcator()
                     appPlugin.showalert(this.$t('warning'), 'Gönderi Paylaşılırken Hata', 'error', this.$t('ok'))
                   })
                   let fileInput = document.getElementById('postFile')
                 }).catch((err) => {
                   debugger
-                  this.loading = false
+                  this.onCloseIndıcator()
                 })
               } else {
                 this.$store.dispatch(CREATE_POST, {
@@ -530,9 +533,9 @@
                     type: 'success',
                     position: 'bottom'
                   })
-                  this.loading = false
+                  this.onCloseIndıcator()
                   this.post = {
-                    lessonid:0,
+                    lessonid: 0,
                     tag: 0,
                     filesize: 0,
                     fileList: [],
@@ -552,7 +555,7 @@
                   fileInput.value = ''
                   this.$emit('onCreated')
                 }).catch((err) => {
-                  this.loading = false
+                  this.onCloseIndıcator()
                   appPlugin.showalert(this.$t('warning'), 'Gönderi Paylaşılırken Hata', 'error', this.$t('ok'))
                 })
                 let fileInput = document.getElementById('postFile')
@@ -630,9 +633,9 @@
                         type: 'success',
                         position: 'bottom'
                       })
-                      this.loading = false
+                      this.onCloseIndıcator()
                       this.post = {
-                        lessonid:0,
+                        lessonid: 0,
                         tag: 0,
                         filesize: 0,
                         fileList: [],
@@ -654,13 +657,13 @@
                     }
 
                   }).catch((err) => {
-                    this.loading = false
+                    this.onCloseIndıcator()
                     appPlugin.showalert(this.$t('warning'), 'Gönderi Paylaşılırken Hata', 'error', this.$t('ok'))
                   })
                   let fileInput = document.getElementById('postFile')
                 }).catch((err) => {
                   debugger
-                  this.loading = false
+                  this.onCloseIndıcator()
                 })
               } else {
                 this.$store.dispatch(CREATE_POST, {
@@ -674,9 +677,9 @@
                     type: 'success',
                     position: 'bottom'
                   })
-                  this.loading = false
+                  this.onCloseIndıcator()
                   this.post = {
-                    lessonid:0,
+                    lessonid: 0,
                     tag: 0,
                     filesize: 0,
                     fileList: [],
@@ -696,7 +699,7 @@
                   fileInput.value = ''
                   this.$emit('onCreated')
                 }).catch((err) => {
-                  this.loading = false
+                  this.onCloseIndıcator()
                   appPlugin.showalert(this.$t('warning'), 'Gönderi Paylaşılırken Hata', 'error', this.$t('ok'))
                 })
                 let fileInput = document.getElementById('postFile')
@@ -779,9 +782,9 @@
                       type: 'success',
                       position: 'bottom'
                     })
-                    this.loading = false
+                    this.onCloseIndıcator()
                     this.post = {
-                      lessonid:0,
+                      lessonid: 0,
                       tag: 0,
                       filesize: 0,
                       fileList: [],
@@ -801,13 +804,13 @@
                     fileInput.value = ''
                     this.$emit('onCreated')
                   }).catch((err) => {
-                    this.loading = false
+                    this.onCloseIndıcator()
                     appPlugin.showalert(this.$t('warning'), 'Gönderi Paylaşılırken Hata', 'error', this.$t('ok'))
                   })
                   let fileInput = document.getElementById('postFile')
                 }).catch((err) => {
                   debugger
-                  this.loading = false
+                  this.onCloseIndıcator()
                 })
               } else {
                 this.$store.dispatch(CREATE_POST, {
@@ -821,9 +824,9 @@
                     type: 'success',
                     position: 'bottom'
                   })
-                  this.loading = false
+                  this.onCloseIndıcator()
                   this.post = {
-                    lessonid:0,
+                    lessonid: 0,
                     tag: 0,
                     filesize: 0,
                     fileList: [],
@@ -843,7 +846,7 @@
                   fileInput.value = ''
                   this.$emit('onCreated')
                 }).catch((err) => {
-                  this.loading = false
+                  this.onCloseIndıcator()
                   appPlugin.showalert(this.$t('warning'), 'Gönderi Paylaşılırken Hata', 'error', this.$t('ok'))
                 })
                 let fileInput = document.getElementById('postFile')
@@ -917,9 +920,9 @@
                       type: 'success',
                       position: 'bottom'
                     })
-                    this.loading = false
+                    this.onCloseIndıcator()
                     this.post = {
-                      lessonid:0,
+                      lessonid: 0,
                       tag: 0,
                       filesize: 0,
                       fileList: [],
@@ -939,13 +942,13 @@
                     fileInput.value = ''
                     this.$emit('onCreated')
                   }).catch((err) => {
-                    this.loading = false
+                    this.onCloseIndıcator()
                     appPlugin.showalert(this.$t('warning'), 'Gönderi Paylaşılırken Hata', 'error', this.$t('ok'))
                   })
                   let fileInput = document.getElementById('postFile')
                 }).catch((err) => {
                   debugger
-                  this.loading = false
+                  this.onCloseIndıcator()
                 })
 
               } else {
@@ -960,9 +963,9 @@
                     type: 'success',
                     position: 'bottom'
                   })
-                  this.loading = false
+                  this.onCloseIndıcator()
                   this.post = {
-                    lessonid:0,
+                    lessonid: 0,
                     tag: 0,
                     filesize: 0,
                     fileList: [],
@@ -982,7 +985,7 @@
                   fileInput.value = ''
                   this.$emit('onCreated')
                 }).catch((err) => {
-                  this.loading = false
+                  this.onCloseIndıcator()
                   appPlugin.showalert(this.$t('warning'), 'Gönderi Paylaşılırken Hata', 'error', this.$t('ok'))
                 })
                 let fileInput = document.getElementById('postFile')
@@ -1077,7 +1080,6 @@
           selectedCat: 0,
           iscommentable: true
         },
-        loading: false,
         isLoading: false,
         users: [],
         selectedGroups: [],

@@ -198,22 +198,13 @@
 
 <script>
   import {
-    SearchBox,
-    Loading,
-    VSelect,
+    appPlugin,
     AlertBox,
-    FlexCard,
-    Flex,
-    VButton,
-    VTabs,
-    VTabContent,
     Multiselect,
-    VTooltipButton,
-    Vuetable,
-    VuetablePaginationBootstrap,
-    VuetablePaginationInfo,
-    appPlugin
   } from '@/Providers/defaultImports'
+  import loadingMixins from '@/mixins/loading'
+  import vuetableMixins from '@/mixins/vuetable'
+  import defaulcomponentsMixins from '@/mixins/defaultcomponents'
   import { FETCH_ALL_PERSONS_EXPORT_EXCEL, FETCH_ALL_SCHOOL_PERSON } from '../../store/modules/users/moduleNames'
 
   export default {
@@ -221,23 +212,13 @@
     components: {
       AlertBox,
       Multiselect,
-      VSelect,
-      VTabs,
-      FlexCard,
-      Flex,
-      VTabContent,
-      SearchBox,
-      Loading,
-      VButton,
-      VTooltipButton,
-      Vuetable,
-      VuetablePaginationBootstrap,
-      VuetablePaginationInfo
     },
+    mixins: [loadingMixins,defaulcomponentsMixins,vuetableMixins],
     methods: {
       exportallData () {
         //TODO
-        this.loading = true
+
+        this.onOpenIndıcator()
         this.$store
           .dispatch(FETCH_ALL_SCHOOL_PERSON, {
             id: this.$route.params.schoolid,
@@ -250,7 +231,7 @@
           })
           .then(res => {
             if (res.length > 0) {
-              this.loading=false
+              this.onCloseIndıcator()
               let keys = ['uName', 'uSurname', 'uPhone', 'uEmail']
               let data = res
               const header = [
@@ -276,7 +257,7 @@
             }
           })
           .catch(err => {
-            this.loading = false
+            this.onCloseIndıcator()
           })
       },
       onCloseAlertLessons () {
@@ -285,33 +266,8 @@
       onCloseAlertClases () {
         this.showAlertClases = false
       },
-      onPaginationData (paginationData) {
-        this.$refs.pagination.setPaginationData(paginationData)
-        this.$refs.paginationInfo.setPaginationData(paginationData)
-      },
       onCloseAlertPersons () {
         this.showAlertPersons = false
-      },
-      onChangePage (page) {
-        this.$refs.vuetable.changePage(page)
-      },
-      onLoading () {
-        this.loading = true
-      },
-      onLoaded () {
-        this.loading = false
-      },
-      onError (err) {
-        this.loading = false
-
-        appPlugin.showalert(
-          'Kayıtlar Getirilirken Bir Hata Gerçekleşti Lütfen Daha Sonra Tekrar Deneyin',
-          '',
-          'error',
-          'Tamam'
-        )
-      },
-      onSuccess () {
       },
       exportExcel () {
         let data = this.currentData.data.data
@@ -338,12 +294,6 @@
             header
           )
         }
-      },
-      onSearchHandler (txt) {
-        this.txt = txt
-        this.$nextTick(function () {
-          this.$refs.vuetable.refresh()
-        })
       },
       onFetchApi (apiUrl, httpOptions) {
         if (isNaN(+this.$route.params.schoolid) == false) {
@@ -392,9 +342,6 @@
           this.$router.replace('/schools')
         }
       },
-      onRefreshTableContent () {
-        this.$refs.vuetable.reload()
-      },
       fetchSchoolData () {
         this.$store
           .dispatch('fetchSchoolClasesBranchesPivotAll', {
@@ -413,10 +360,10 @@
                 this.showAlertClases = true
               }
             }
-            this.loading = false
+            this.onCloseIndıcator()
           })
           .catch(err => {
-            this.loading = false
+            this.onCloseIndıcator()
           })
 
         this.$store
@@ -433,11 +380,11 @@
             }
           })
           .catch(err => {
-            this.loading = false
+            this.onCloseIndıcator()
           })
       },
       addUserSchoolClasesBranchesData (userId) {
-        this.loading = true
+        this.onOpenIndıcator()
         var data = []
         this.personClasesData.forEach(item => {
           data.push({
@@ -464,7 +411,7 @@
                   this.personClasesData = []
                   this.selectedUser = {}
                   this.personLessonData = []
-                  this.loading = false
+                  this.onCloseIndıcator()
                 }
               } else {
                 appPlugin.showalert(
@@ -473,11 +420,11 @@
                   'error',
                   'Tamam'
                 )
-                this.loading = false
+                this.onCloseIndıcator()
               }
             })
             .catch(err => {
-              this.loading = false
+              this.onCloseIndıcator()
               appPlugin.showalert(
                 'Personel İlgili Okul Sınıf ve Şube Atamaları Oluşturulurken Hata Gerçekleşti',
                 '',
@@ -488,7 +435,7 @@
         })
       },
       addUserSchoolClasesData (userId) {
-        this.loading = true
+        this.onOpenIndıcator()
         this.addUserSchoolClasesBranchesData(userId)
         this.personClasesData.forEach(item => {
           var data = []
@@ -504,10 +451,10 @@
             .then(res => {
               if (res.status) {
                 if (res.status == 200) {
-                  this.loading = true
+                  this.onOpenIndıcator()
                 }
               } else {
-                this.loading = false
+                this.onCloseIndıcator()
                 appPlugin.showalert(
                   'Personel İlgili Okul Ve Sınıfa Eklenirken Hata Gerçekleşti',
                   '',
@@ -517,7 +464,7 @@
               }
             })
             .catch(err => {
-              this.loading = false
+              this.onCloseIndıcator()
               appPlugin.showalert(
                 'Personel İlgili Okul Ve Sınıfa Eklenirken Hata Gerçekleşti',
                 '',
@@ -528,7 +475,7 @@
         })
       },
       addUserSchoolLessonData (userId) {
-        this.loading = true
+        this.onOpenIndıcator()
         this.addUserSchoolClasesData(userId)
         var data = []
         this.personLessonData.forEach(item => {
@@ -544,17 +491,17 @@
             .then(res => {
               if (res.status) {
                 if (res.status == 200) {
-                  this.loading = false
+                  this.onCloseIndıcator()
                 } else {
-                  this.loading = false
+                  this.onCloseIndıcator()
                 }
               } else {
-                this.loading = false
+                this.onCloseIndıcator()
               }
               console.log('userokulders', res.status)
             })
             .catch(err => {
-              this.loading = false
+              this.onCloseIndıcator()
               appPlugin.showalert(
                 'Personel Okul ve Derslere Eklenirken Hata Gerçekleşti',
                 '',
@@ -566,7 +513,7 @@
         })
       },
       addLessonUserData (userId) {
-        this.loading = true
+        this.onOpenIndıcator()
         let data = []
         this.personLessonData.forEach(item => {
           data.push({
@@ -579,11 +526,11 @@
           .then(res => {
             if (res.status) {
               if (res.status == 200) {
-                this.loading = false
+                this.onCloseIndıcator()
                 this.addUserSchoolLessonData(userId)
               }
             } else {
-              this.loading = false
+              this.onCloseIndıcator()
               appPlugin.showalert(
                 'Personel Derslere Eklenirken Hata Gerçekleşti',
                 '',
@@ -593,7 +540,7 @@
             }
           })
           .catch(err => {
-            this.loading = false
+            this.onCloseIndıcator()
             appPlugin.showalert(
               'Personel Derslere Eklenirken Hata Gerçekleşti',
               '',
@@ -611,7 +558,7 @@
           schoolid: this.$route.params.schoolid,
           userid: userID
         })
-        this.loading = true
+        this.onOpenIndıcator()
         this.$store
           .dispatch('createUserSchool', {
             userschoollist: data
@@ -619,7 +566,7 @@
           .then(res => {
             if (res.status) {
               if (res.status == 200) {
-                this.loading = false
+                this.onCloseIndıcator()
                 if (this.schoolTaskStatus == 0) {
                   this.addLessonUserData(userID)
                 } else {
@@ -642,7 +589,7 @@
                 'error',
                 'Tamam'
               )
-              this.loading = false
+              this.onCloseIndıcator()
             }
           })
           .catch(err => {
@@ -652,7 +599,7 @@
               'error',
               'Tamam'
             )
-            this.loading = false
+            this.onCloseIndıcator()
           })
       },
       showSchool () {
@@ -709,17 +656,11 @@
         this.isTouched = true
       }
     },
-    computed: {
-      isInvalid () {
-      }
-    },
     data () {
       return {
         showAlertLessons: false,
         showAlertClases: false,
         showAlertPersons: false,
-        loading: false,
-        moreParams: {},
         personClasesData: [],
         schoolTaskStatus: '0',
         schoolLessonsData: [],
@@ -728,11 +669,10 @@
         isTouched: false,
         userData: [],
         selectedUser: {},
-        txt: ''
       }
     },
     created () {
-      this.loading = true
+      this.onOpenIndıcator()
       this.showSchool()
       this.fetchSchoolData()
       this.$store
@@ -742,14 +682,14 @@
         .then(res => {
           if (res && res.length > 0) {
             this.userData = res
-            this.loading = false
+            this.onCloseIndıcator()
           } else {
-            this.loading = false
+            this.onCloseIndıcator()
             this.showAlertPersons = true
           }
         })
         .catch(err => {
-          this.loading = false
+          this.onCloseIndıcator()
         })
     }
   }

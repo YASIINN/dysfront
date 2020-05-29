@@ -217,7 +217,7 @@
     FETCH_ALL_TEAMS
   } from '@/store/modules/team/moduleNames'
   import { FETCH__ALL_SPOR_CLUB } from '@/store/modules/sporclub/moduleNames'
-
+  import loadingMixins from '@/mixins/loading'
   export default {
     name: 'index',
     validations: {
@@ -233,10 +233,11 @@
         }
       }
     },
+    mixins:[loadingMixins],
     created () {
-      this.loading = true
+        this.onOpenIndıcator()
       this.$store.dispatch(FETCH__ALL_SPOR_CLUB).then(res => {
-        this.loading = false
+        this.onCloseIndıcator()
         if (res.length < 1) {
           this.showAlert = true
         }
@@ -272,7 +273,7 @@
             this.$t('ok')
           )
         } else {
-          this.loading = true
+            this.onOpenIndıcator()
           let data = {
             updated: this.teamData
           }
@@ -302,7 +303,7 @@
               )
             }
             this.onRefreshTableContent()
-            this.loading = false
+            this.onCloseIndıcator()
             this.onResetData()
           })
         }
@@ -326,7 +327,7 @@
         }
       },
       onError (err) {
-        this.loading = false
+        this.onCloseIndıcator()
         appPlugin.showalert(this.$t('getRecordErro'), '', 'error', this.$t('ok'))
       },
       onChangePage (page) {
@@ -337,7 +338,7 @@
         this.$refs.paginationInfo.setPaginationData(paginationData)
       },
       onLoading () {
-        this.loading = true
+        this.onOpenIndıcator()
       },
       onCreateHandler () {
         if (this.$v.teamData.club.$invalid) {
@@ -362,7 +363,7 @@
             this.$t('ok')
           )
         } else {
-          this.loading = true
+            this.onOpenIndıcator()
           let data = {
             code: this.teamData.code,
             name: this.teamData.name,
@@ -395,12 +396,12 @@
               )
             }
             this.onRefreshTableContent()
-            this.loading = false
+            this.onCloseIndıcator()
           })
         }
       },
       onLoaded () {
-        this.loading = false
+        this.onCloseIndıcator()
       },
       onRefreshTableContent () {
         this.$refs.vuetable.reload()
@@ -447,7 +448,7 @@
           showCancelButton: true
         }).then(res => {
           if (res.value) {
-            this.loading = true
+              this.onOpenIndıcator()
             this.$store
               .dispatch(DELETE_TEAMS, {
                 deleted: item,
@@ -472,7 +473,7 @@
                   )
                 }
                 this.onRefreshTableContent()
-                this.loading = false
+                this.onCloseIndıcator()
               })
           }
         })
@@ -500,7 +501,7 @@
         }
       },
       exportallData () {
-        this.loading = true
+          this.onOpenIndıcator()
         this.$store
           .dispatch(FETCH_ALL_TEAMS)
           .then(res => {
@@ -520,10 +521,10 @@
               const header = ['Takım  Kodu', 'Takım  Adı', 'Spor Kulübü Adı']
               appPlugin.exportExcelTable(res, 'Takımlar', 14, keys, header)
             }
-            this.loading = false
+            this.onCloseIndıcator()
           })
           .catch(err => {
-            this.loading = false
+            this.onCloseIndıcator()
           })
       }
     },
@@ -533,7 +534,6 @@
         showAlert: false,
         moreParams: {},
         txt: '',
-        loading: false,
         dataselected: false,
         teamData: {
           name: '',

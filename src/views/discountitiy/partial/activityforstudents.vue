@@ -145,6 +145,8 @@
   } from '@/Providers/defaultImports'
   import { FETCH_STUDENT_FOR_D, FETCH_STUDENTFOR_DISCONT_A } from '@/store/modules/discontinuity/moduleNames'
   //SET_STUDENT_ACTIVITY_FORA
+  import loadingMixins from '@/mixins/loading'
+
   export default {
     components: {
       SearchBox,
@@ -163,6 +165,7 @@
       VuetablePaginationInfo,
       Datetime
     },
+    mixins: [loadingMixins],
     methods: {
       onChangeFilter (item, i, k) {
         //TODO AYNISI OKUL TARAFINA DA YAPILACAK
@@ -196,14 +199,15 @@
         } else if (this.selectedStudent == '') {
           appPlugin.showalert(this.$t('warning'), this.$t('selectstudent'), 'warning', this.$t('ok'))
         } else {
-          debugger
+
+          this.onOpenIndıcator()
           this.$store.dispatch(FETCH_DTYPE).then((res) => {
-            debugger
-            this.loading = false
+
+            this.onCloseIndıcator()
             res.data.unshift({ id: 0, dtName: 'Tümü' })
             this.dtypes = res.data
           }).catch((err) => {
-            this.loading = false
+            this.onCloseIndıcator()
 
             appPlugin.showalert(this.$t('warning'), this.$t('getRecordErro', 'eror', this.$t('ok')))
 
@@ -220,16 +224,16 @@
             }
             let keys = Object.keys(res.data)
             for (let i = 0; i < keys.length; i++) {
-              debugger
+
               res.data[keys[i]].dtype = { id: 0, dtName: 'Tümü' }
             }
             let storageData = JSON.parse(JSON.stringify(res.data))
             localStorage.setItem('sData', JSON.stringify(storageData))
             this.sfordactivity = res.data
-            this.loading = false
+            this.onCloseIndıcator()
           }).catch((err) => {
             appPlugin.showalert(this.$t('warning'), this.$t('getRecordErro'), 'error', this.$t('ok'))
-            this.loading = false
+            this.onCloseIndıcator()
           })
         }
       },
@@ -243,7 +247,7 @@
           this.$store.dispatch(FETCH_STUDENTS_D, {
             urlparse: query
           }).then((res) => {
-            debugger
+
             if (res.status === 200) {
               this.students = res.data
             }
@@ -260,7 +264,6 @@
         dtypes: [],
         selectedStudent: '',
         students: [],
-        loading: false,
         isLoading: false,
         startdate: '',
         enddate: '',

@@ -130,53 +130,28 @@
 
 <script>
   import {
-    SearchBox,
-    Loading,
-    FlexCard,
-    Flex,
-    VButton,
     required,
-    VInput,
-    VTooltipButton,
-    Vuetable,
     Swal,
-    VuetablePaginationBootstrap,
-    VuetablePaginationInfo,
     appPlugin
   } from '@/Providers/defaultImports'
-
+  import loadingMixins from '@/mixins/loading'
+  import vuetableMixins from '@/mixins/vuetable'
+  import defaulcomponentsMixins from '@/mixins/defaultcomponents'
   export default {
+    mixins: [loadingMixins,vuetableMixins,defaulcomponentsMixins],
     name: 'index',
-    components: {
-      FlexCard,
-      Flex,
-      SearchBox,
-      VInput,
-      Loading,
-      VButton,
-      VTooltipButton,
-      Vuetable,
-      VuetablePaginationBootstrap,
-      VuetablePaginationInfo
-    },
     data () {
       return {
-        currentData: [],
-        moreParams: {},
-        txt: '',
-        loading: false,
-        dataselected: false,
         provinceData: {
           name: '',
           code: ''
         },
-        selectedData: {}
       }
     },
     created () {
-      this.loading = true
+      this.onOpenIndıcator()
       this.$store.dispatch('fetchProvince')
-      this.loading = false
+      this.onCloseIndıcator()
     },
     validations: {
       provinceData: {
@@ -190,9 +165,9 @@
     },
     methods: {
       exportallData () {
-        this.loading = true
+        this.onOpenIndıcator()
         this.$store.dispatch('fetchAllProvince').then((res) => {
-          this.loading = false
+          this.onCloseIndıcator()
           if (res.length > 0) {
             const data = res
             const keys = ['pName', 'pCode']
@@ -206,9 +181,8 @@
               this.$t('ok')
             )
           }
-
         }).catch((err) => {
-          this.loading = false
+          this.onCloseIndıcator()
         })
       },
       onFetchApi (apiUrl, httpOptions) {
@@ -233,31 +207,6 @@
           return data
         }
       },
-      onChangePage (page) {
-        this.$refs.vuetable.changePage(page)
-      },
-      onPaginationData (paginationData) {
-        this.$refs.pagination.setPaginationData(paginationData)
-        this.$refs.paginationInfo.setPaginationData(paginationData)
-      },
-      onLoading () {
-        this.loading = true
-      },
-      onLoaded () {
-        this.loading = false
-      },
-      onSuccess () {
-        /* succesFetchDataApi */
-      },
-      onError () {
-        this.loading = false
-        appPlugin.showalert(
-          this.$t('getRecordErro'),
-          '',
-          'error',
-          this.$t('ok')
-        )
-      },
       onUpdate () {
         if (this.$v.provinceData.code.$invalid) {
           appPlugin.showalert(
@@ -274,7 +223,7 @@
             this.$t('ok')
           )
         } else {
-          this.loading = true
+          this.onOpenIndıcator()
           this.$store.dispatch('updateProvince', this.provinceData).then(res => {
             if (res.status) {
               if (res.status === 200) {
@@ -303,7 +252,7 @@
 
             this.onResetData()
             this.onRefreshTableContent()
-            this.loading = false
+            this.onCloseIndıcator()
           })
         }
       },
@@ -335,7 +284,7 @@
           showCancelButton: true
         }).then(res => {
           if (res.value) {
-            this.loading = true
+            this.onOpenIndıcator()
             this.$store
               .dispatch('deleteProvince', {
                 deleted: item,
@@ -360,17 +309,10 @@
                   )
                 }
                 this.onRefreshTableContent()
-                this.loading = false
+                this.onCloseIndıcator()
               })
           }
         })
-      },
-      onRefreshTableContent () {
-        this.$refs.vuetable.reload()
-      },
-      onCancel () {
-        this.dataselected = !this.dataselected
-        this.onResetData()
       },
       onCreateHandler () {
         if (this.$v.provinceData.code.$invalid) {
@@ -388,7 +330,7 @@
             this.$t('ok')
           )
         } else {
-          this.loading = true
+          this.onOpenIndıcator()
           let data = {
             created: this.provinceData,
             urlparse: appPlugin.urlParse(
@@ -422,7 +364,7 @@
             }
 
             this.onRefreshTableContent()
-            this.loading = false
+            this.onCloseIndıcator()
           })
         }
       },
@@ -441,12 +383,6 @@
           )
         }
       },
-      onSearchHandler (txt) {
-        this.txt = txt
-        this.$nextTick(function () {
-          this.$refs.vuetable.refresh()
-        })
-      }
     }
   }
 </script>

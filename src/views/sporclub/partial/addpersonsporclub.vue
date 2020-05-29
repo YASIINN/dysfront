@@ -112,6 +112,7 @@
   import { FETCH_ALL_SC_TEAM_BRANCH } from '@/store/modules/sporclubteambranchpivot/moduleNames'
   import teambranchlist from './teambranchlist'
   import addteambranch from './addteambranch'
+  import loadingMixins from '@/mixins/loading'
 
   export default {
     name: 'addpersonsporclub',
@@ -119,6 +120,7 @@
       sporClub: {},
       onreset: {},
     },
+    mixins: [loadingMixins],
     watch: {
       onreset (val) {
         if (val == true) {
@@ -189,7 +191,8 @@
         }
       },
       savePersonSCTeamBranch (userID) {
-        this.loading = true
+        this.onOpenIndıcator()
+
         let data = []
         this.sporClubTB.forEach(item => {
           data.push({
@@ -213,7 +216,7 @@
                   'success',
                   this.$t('ok')
                 )
-                this.loading = false
+                this.onCloseIndıcator()
               } else {
                 appPlugin.showalert(
                   this.$t('warning'),
@@ -221,7 +224,7 @@
                   'error',
                   this.$t('ok')
                 )
-                this.loading = false
+                this.onCloseIndıcator()
               }
             } else {
               appPlugin.showalert(
@@ -230,11 +233,11 @@
                 'error',
                 this.$t('ok')
               )
-              this.loading = false
+              this.onCloseIndıcator()
             }
           })
           .catch(err => {
-            this.loading = false
+            this.onCloseIndıcator()
             appPlugin.showalert(
               this.$t('warning'),
               this.$t('ptasksporclubteambrancherr'),
@@ -244,7 +247,7 @@
           })
       },
       savePersonSC () {
-        this.loading = true
+        this.onOpenIndıcator()
         this.$store
           .dispatch(CREATE_USER_SPOR_CLUB, {
             usersporclublist: [
@@ -260,18 +263,18 @@
               this.selectedUser = {}
               appPlugin.showalert(
                 this.$t('persontasksuccess'),
-              '',
+                '',
                 'success',
                 this.$t('ok')
-            )
-              this.loading = false
+              )
+              this.onCloseIndıcator()
             } else {
-              this.loading = false
+              this.onCloseIndıcator()
               this.savePersonSCTeamBranch(this.selectedUser.id)
             }
           })
           .catch(err => {
-            this.loading = false
+            this.onCloseIndıcator()
           })
         //  this.$store.dispatch("createUserSporClub",{}).then((res)=>{}).catch((err)=>{})
       },
@@ -286,19 +289,19 @@
           .then(res => {
             if (res && res.length > 0) {
               this.userData = res
-              this.loading = false
+              this.onCloseIndıcator()
             } else {
-              this.loading = false
+              this.onCloseIndıcator()
               this.showAlertPersons = true
             }
           })
           .catch(err => {
-            this.loading = false
+            this.onCloseIndıcator()
           })
       },
       fetchTeamBranch () {
         if (isNaN(+this.$route.params.id) == false) {
-          this.loading = true
+          this.onOpenIndıcator()
           this.$store
             .dispatch(FETCH_ALL_SC_TEAM_BRANCH, {
               query: appPlugin.urlParse(
@@ -312,10 +315,10 @@
                 })
                 this.sporClubTBData = res.data
               }
-              this.loading = false
+              this.onCloseIndıcator()
             })
             .catch(err => {
-              this.loading = false
+              this.onCloseIndıcator()
             })
         } else {
           appPlugin.showalert(
@@ -334,7 +337,6 @@
         sporclubtaskstatus: 0,
         userData: [],
         selectedUser: {},
-        loading: false,
         sporClubTBData: [],
         sporClubTB: []
       }

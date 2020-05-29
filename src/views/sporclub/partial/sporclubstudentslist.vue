@@ -68,7 +68,8 @@
               style="cursor:pointer !important;"
               class="font-weight-bold pl-5"
               :to="'/students/'+props.rowData.id"
-            >Detaylar</router-link>
+            >Detaylar
+            </router-link>
           </template>
         </vuetable>
         <vuetable-pagination-info ref="paginationInfo"></vuetable-pagination-info>
@@ -85,284 +86,287 @@
 </template>
 
 <script>
-import {
-  SearchBox,
-  Loading,
-  VSelect,
-  AlertBox,
-  FlexCard,
-  Swal,
-  Flex,
-  VButton,
-  VTabs,
-  appPlugin,
-  VTabContent,
-  Multiselect,
-  VTooltipButton,
-  Vuetable,
-  VuetablePaginationBootstrap,
-  VuetablePaginationInfo
-} from "@/Providers/defaultImports";
-import defaultImage from "@/assets/img/default-pp.png";
-
-export default {
-  name: "sporclubstudentslist",
-  data() {
-    return {
-      defaultPreview: defaultImage,
-      currentData: [],
-      moreParams: {},
-      txt: "",
-      loading: false,
-      personHeader: [
-        {
-          name: "__sequence",
-          title: "#",
-          titleClass: "center aligned",
-          dataClass: "right aligned"
-        },
-        {
-          name: "__slot:image",
-          title: '<i class="fas fa-image"></i> '
-        },
-        {
-          name: "s_name",
-          title: '<i class="fas fa-lightbulb"></i>Ad '
-        },
-        {
-          name: "s_surname",
-          title: '<i class="fas fa-graduation-cap"></i>Soyad'
-        },
-        {
-          name: "s_tc",
-          title: '<i class="fas fa-building"></i>Tc No'
-        },
-        {
-          name: "__slot:gender",
-          title: '<i class="fas fa-building"></i>Cinsiyet '
-        },
-        {
-          name: "__slot:details",
-          title: '<i class="fas fa-info"></i>Detaylar'
-        },
-        {
-          name: "__slot:actions",
-          title: '<i class="fas fa-pen-fancy"></i>İşlemler'
-        }
-      ]
-    };
-  },
-  methods: {
-    onRefreshTableContent() {
-      this.$refs.vuetable.reload();
-    },
-    onFetchApi(apiUrl, httpOptions) {
-      var data;
-      if (this.txt.trim() != "") {
-        data = this.$store.dispatch("fetchSporClubStudents", {
-          httpOpt: httpOptions,
-          id: this.$route.params.id,
-          fullname: this.txt
-        });
-        data.then(res => {
-          res.data.data.forEach(item => {
-            if (item.s_gender == "0") {
-              item.s_gender = "Kadın";
-            } else {
-              item.s_gender = "Erkek";
-            }
-          });
-
-          this.currentData = res;
-        });
-        return data;
-      } else {
-        data = this.$store.dispatch("fetchSporClubStudents", {
-          httpOpt: httpOptions,
-          id: this.$route.params.id
-        });
-        data.then(res => {
-          res.data.data.forEach(item => {
-            if (item.s_gender == "0") {
-              item.s_gender = "Kadın";
-            } else {
-              item.s_gender = "Erkek";
-            }
-          });
-
-          this.currentData = res;
-        });
-        return data;
-      }
-    },
-    exportallData() {
-      this.loading = true;
-      this.$store
-        .dispatch("fetclAllStudentsExport", { id: this.$route.params.id })
-        .then(res => {
-          this.loading = false;
-          if (res.status == 200 && res.data.length > 0) {
-            res.data.forEach(item => {
-              if (item.s_gender == "0") {
-                item.s_gender = "Kadın";
-              } else {
-                item.s_gender = "Erkek";
-              }
-            });
-            let data = res.data;
-            let keys = ["s_name", "s_surname", "s_tc", "s_gender"];
-            const header = ["Öğrenci Adı", "Öğrenci SoyAdı", "TC", "Cinsiyet"];
-            appPlugin.exportExcelTable(
-              data,
-              this.sporClub.scName + " " + "Öğrenci Bilgisi",
-              14,
-              keys,
-              header
-            );
-          } else {
-            appPlugin.showalert(
-              this.$t('warning'),
-              this.$t('excelExportWarning'),
-              'info',
-              this.$t('ok')
-            )
-          }
-        })
-        .catch(err => {
-          this.loading = false;
-        });
-    },
-    onChangePage(page) {
-      this.$refs.vuetable.changePage(page);
-    },
-    onSuccess() {},
-    onError(err) {
-      this.loading = false;
-      appPlugin.showalert(this.$t('fetchError'), '', 'error', this.$t('ok'))
-    },
-    onPaginationData(paginationData) {
-      this.$refs.pagination.setPaginationData(paginationData);
-      this.$refs.paginationInfo.setPaginationData(paginationData);
-    },
-    onLoading() {
-      this.loading = true;
-    },
-    onLoaded() {
-      this.loading = false;
-    },
-    onSearchHandler(txt) {
-      this.txt = txt;
-      this.$nextTick(function() {
-        this.$refs.vuetable.refresh();
-      });
-    },
-    onDelete(item, i) {
-      console.log("aa", item);
-      Swal.fire({
-        title:
-          "Öğrenci Adı  : " +
-          " " +
-          item.s_name +
-          "\n" +
-          "Öğrenci Soy Adı :" +
-          " " +
-          item.s_surname +
-          "\n" +
-          "Spor Kulübü Adı :" +
-          " " +
-          this.sporClub.scName +
-          " " +
-          "\n" +
-          "Kaydını Silmek İstediğinize Emin Misiniz ?",
-        confirmButtonText: "Evet",
-        confirmButtonColor: "red",
-        icon: "info",
-        cancelButtonText: "Vazgeç",
-        showCancelButton: true
-      }).then(res => {
-        if (res.value) {
-          this.loading = true;
-          this.$store
-            .dispatch("deleteSporClubStudents", {
-              urlparse: appPlugin.urlParse(
-                "spor_club_id=" + this.sporClub.id + "& student_id=" + item.id
-              )
-            })
-            .then(res => {
-              if (res.status) {
-                if (res.status === 200) {
-                  appPlugin.showalert(
-                    "Kayıt Başarıyla Silindi",
-                    "",
-                    "success",
-                    "Tamam"
-                  );
-                }
-              } else {
-                appPlugin.showalert(
-                  "Kayıt Silinirken Hata Gerçekleşti",
-                  "",
-                  "error",
-                  "Tamam"
-                );
-              }
-              this.onRefreshTableContent();
-              this.loading = false;
-            });
-        }
-      });
-    },
-    exportExcel() {
-      if (this.currentData.data.data.length > 0) {
-        let data = this.currentData.data.data;
-        let keys = ["s_name", "s_surname", "s_tc", "s_gender"];
-        const header = ["Öğrenci Adı", "Öğrenci SoyAdı", "TC", "Cinsiyet"];
-        appPlugin.exportExcelTable(
-          data,
-          this.sporClub.scName + " " + "Öğrenci Bilgisi",
-          14,
-          keys,
-          header
-        );
-      } else {
-        appPlugin.showalert(
-          this.$t('warning'),
-          this.$t('excelExportWarning'),
-          'info',
-          this.$t('ok')
-        )
-      }
-    }
-  },
-  watch: {
-    onreset: function(val) {
-      if (val == true) {
-        this.onRefreshTableContent();
-        this.$emit("onRefresh", true);
-      }
-    }
-  },
-  props: {
-    onreset: {},
-    sporClub: {}
-  },
-  components: {
-    AlertBox,
-    Multiselect,
-    VSelect,
-    VTabs,
-    FlexCard,
-    Flex,
-    VTabContent,
+  import {
     SearchBox,
     Loading,
+    VSelect,
+    AlertBox,
+    FlexCard,
+    Swal,
+    Flex,
     VButton,
+    VTabs,
+    appPlugin,
+    VTabContent,
+    Multiselect,
     VTooltipButton,
     Vuetable,
     VuetablePaginationBootstrap,
     VuetablePaginationInfo
+  } from '@/Providers/defaultImports'
+  import defaultImage from '@/assets/img/default-pp.png'
+  import loadingMixins from '@/mixins/loading'
+
+  export default {
+    name: 'sporclubstudentslist',
+    mixins: [loadingMixins],
+    data () {
+      return {
+        defaultPreview: defaultImage,
+        currentData: [],
+        moreParams: {},
+        txt: '',
+        personHeader: [
+          {
+            name: '__sequence',
+            title: '#',
+            titleClass: 'center aligned',
+            dataClass: 'right aligned'
+          },
+          {
+            name: '__slot:image',
+            title: '<i class="fas fa-image"></i> '
+          },
+          {
+            name: 's_name',
+            title: '<i class="fas fa-lightbulb"></i>Ad '
+          },
+          {
+            name: 's_surname',
+            title: '<i class="fas fa-graduation-cap"></i>Soyad'
+          },
+          {
+            name: 's_tc',
+            title: '<i class="fas fa-building"></i>Tc No'
+          },
+          {
+            name: '__slot:gender',
+            title: '<i class="fas fa-building"></i>Cinsiyet '
+          },
+          {
+            name: '__slot:details',
+            title: '<i class="fas fa-info"></i>Detaylar'
+          },
+          {
+            name: '__slot:actions',
+            title: '<i class="fas fa-pen-fancy"></i>İşlemler'
+          }
+        ]
+      }
+    },
+    methods: {
+      onRefreshTableContent () {
+        this.$refs.vuetable.reload()
+      },
+      onFetchApi (apiUrl, httpOptions) {
+        var data
+        if (this.txt.trim() != '') {
+          data = this.$store.dispatch('fetchSporClubStudents', {
+            httpOpt: httpOptions,
+            id: this.$route.params.id,
+            fullname: this.txt
+          })
+          data.then(res => {
+            res.data.data.forEach(item => {
+              if (item.s_gender == '0') {
+                item.s_gender = 'Kadın'
+              } else {
+                item.s_gender = 'Erkek'
+              }
+            })
+
+            this.currentData = res
+          })
+          return data
+        } else {
+          data = this.$store.dispatch('fetchSporClubStudents', {
+            httpOpt: httpOptions,
+            id: this.$route.params.id
+          })
+          data.then(res => {
+            res.data.data.forEach(item => {
+              if (item.s_gender == '0') {
+                item.s_gender = 'Kadın'
+              } else {
+                item.s_gender = 'Erkek'
+              }
+            })
+
+            this.currentData = res
+          })
+          return data
+        }
+      },
+      exportallData () {
+        this.onOpenIndıcator()
+        this.$store
+          .dispatch('fetclAllStudentsExport', { id: this.$route.params.id })
+          .then(res => {
+            this.onCloseIndıcator()
+            if (res.status == 200 && res.data.length > 0) {
+              res.data.forEach(item => {
+                if (item.s_gender == '0') {
+                  item.s_gender = 'Kadın'
+                } else {
+                  item.s_gender = 'Erkek'
+                }
+              })
+              let data = res.data
+              let keys = ['s_name', 's_surname', 's_tc', 's_gender']
+              const header = ['Öğrenci Adı', 'Öğrenci SoyAdı', 'TC', 'Cinsiyet']
+              appPlugin.exportExcelTable(
+                data,
+                this.sporClub.scName + ' ' + 'Öğrenci Bilgisi',
+                14,
+                keys,
+                header
+              )
+            } else {
+              appPlugin.showalert(
+                this.$t('warning'),
+                this.$t('excelExportWarning'),
+                'info',
+                this.$t('ok')
+              )
+            }
+          })
+          .catch(err => {
+            this.onCloseIndıcator()
+          })
+      },
+      onChangePage (page) {
+        this.$refs.vuetable.changePage(page)
+      },
+      onSuccess () {
+      },
+      onError (err) {
+        this.onCloseIndıcator()
+        appPlugin.showalert(this.$t('fetchError'), '', 'error', this.$t('ok'))
+      },
+      onPaginationData (paginationData) {
+        this.$refs.pagination.setPaginationData(paginationData)
+        this.$refs.paginationInfo.setPaginationData(paginationData)
+      },
+      onLoading () {
+        this.onOpenIndıcator()
+      },
+      onLoaded () {
+        this.onCloseIndıcator()
+      },
+      onSearchHandler (txt) {
+        this.txt = txt
+        this.$nextTick(function () {
+          this.$refs.vuetable.refresh()
+        })
+      },
+      onDelete (item, i) {
+        console.log('aa', item)
+        Swal.fire({
+          title:
+            'Öğrenci Adı  : ' +
+            ' ' +
+            item.s_name +
+            '\n' +
+            'Öğrenci Soy Adı :' +
+            ' ' +
+            item.s_surname +
+            '\n' +
+            'Spor Kulübü Adı :' +
+            ' ' +
+            this.sporClub.scName +
+            ' ' +
+            '\n' +
+            'Kaydını Silmek İstediğinize Emin Misiniz ?',
+          confirmButtonText: 'Evet',
+          confirmButtonColor: 'red',
+          icon: 'info',
+          cancelButtonText: 'Vazgeç',
+          showCancelButton: true
+        }).then(res => {
+          if (res.value) {
+            this.onOpenIndıcator()
+            this.$store
+              .dispatch('deleteSporClubStudents', {
+                urlparse: appPlugin.urlParse(
+                  'spor_club_id=' + this.sporClub.id + '& student_id=' + item.id
+                )
+              })
+              .then(res => {
+                if (res.status) {
+                  if (res.status === 200) {
+                    appPlugin.showalert(
+                      'Kayıt Başarıyla Silindi',
+                      '',
+                      'success',
+                      'Tamam'
+                    )
+                  }
+                } else {
+                  appPlugin.showalert(
+                    'Kayıt Silinirken Hata Gerçekleşti',
+                    '',
+                    'error',
+                    'Tamam'
+                  )
+                }
+                this.onRefreshTableContent()
+
+                this.onCloseIndıcator()
+              })
+          }
+        })
+      },
+      exportExcel () {
+        if (this.currentData.data.data.length > 0) {
+          let data = this.currentData.data.data
+          let keys = ['s_name', 's_surname', 's_tc', 's_gender']
+          const header = ['Öğrenci Adı', 'Öğrenci SoyAdı', 'TC', 'Cinsiyet']
+          appPlugin.exportExcelTable(
+            data,
+            this.sporClub.scName + ' ' + 'Öğrenci Bilgisi',
+            14,
+            keys,
+            header
+          )
+        } else {
+          appPlugin.showalert(
+            this.$t('warning'),
+            this.$t('excelExportWarning'),
+            'info',
+            this.$t('ok')
+          )
+        }
+      }
+    },
+    watch: {
+      onreset: function (val) {
+        if (val == true) {
+          this.onRefreshTableContent()
+          this.$emit('onRefresh', true)
+        }
+      }
+    },
+    props: {
+      onreset: {},
+      sporClub: {}
+    },
+    components: {
+      AlertBox,
+      Multiselect,
+      VSelect,
+      VTabs,
+      FlexCard,
+      Flex,
+      VTabContent,
+      SearchBox,
+      Loading,
+      VButton,
+      VTooltipButton,
+      Vuetable,
+      VuetablePaginationBootstrap,
+      VuetablePaginationInfo
+    }
   }
-};
 </script>
 
 <style scoped>

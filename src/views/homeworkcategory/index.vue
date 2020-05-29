@@ -86,8 +86,10 @@
     FETCH_HOME_WORK_CATEGORY, UPDATE_HOME_WORK_CATEGORY
   } from '../../store/modules/homeworkcategory/moduleNames'
   import { CREATE_POST_TAG, DELETE_POST_TAG, UPDATE_POST_TAG } from '../../store/modules/posttag/moduleNames'
+  import loadingMixins from '@/mixins/loading'
 
   export default {
+    mixins: [loadingMixins],
     name: 'index',
     created () {
       this.fetchHomeWorkCategory()
@@ -113,7 +115,7 @@
         if (this.homeworkcatData.catname.trim() == '') {
           appPlugin.showalert(this.$t('warning'), 'Lütfen Ödev Tür Adı Giriniz', 'info', this.$t('ok'))
         } else {
-          this.loading = true
+          this.onOpenIndıcator()
           this.$store.dispatch(UPDATE_HOME_WORK_CATEGORY, {
             id: this.homeworkcatData.id,
             hcatname: this.homeworkcatData.catname
@@ -127,9 +129,9 @@
               id: '',
               catname: ''
             }
-            this.loading = false
+            this.onCloseIndıcator()
           }).catch((err) => {
-            this.loading = false
+            this.onCloseIndıcator()
             appPlugin.showalert(this.$t('warning'), this.$t('updateErrorMsg'), 'error', this.$t('ok'))
           })
         }
@@ -146,7 +148,7 @@
           showCancelButton: true
         }).then(res => {
           if (res.value) {
-            this.loading = true
+            this.onOpenIndıcator()
 
             this.$store
               .dispatch(DELETE_HOME_WORK_CATEGORY, {
@@ -172,7 +174,7 @@
                   )
                 }
 
-                this.loading = false
+                this.onCloseIndıcator()
               })
           }
         })
@@ -181,7 +183,7 @@
         if (this.homeworkcatData.catname.trim() == '') {
           appPlugin.showalert(this.$t('warning'), 'Lütfen Ödev Tür Adı Giriniz', 'info', this.$t('ok'))
         } else {
-          this.loading = true
+          this.onOpenIndıcator()
           this.$store.dispatch(CREATE_HOME_WORK_CATEGORY, {
             hcatname: this.homeworkcatData.catname
           }).then((res) => {
@@ -194,19 +196,19 @@
               id: '',
               catname: ''
             }
-            this.loading = false
+            this.onCloseIndıcator()
           }).catch((err) => {
-            this.loading = false
+            this.onCloseIndıcator()
             appPlugin.showalert(this.$t('warning'), this.$t('errorcreatemessage'), 'error', this.$t('ok'))
           })
         }
       },
       fetchHomeWorkCategory () {
-        this.loading = true
+        this.onOpenIndıcator()
         this.$store.dispatch(FETCH_HOME_WORK_CATEGORY).then((res) => {
-          this.loading = false
+          this.onCloseIndıcator()
         }).catch((err) => {
-          this.loading = false
+          this.onCloseIndıcator()
           appPlugin.showalert(this.$t('warning'), this.$t('fetchError'), 'error', this.$t('ok'))
         })
       }
@@ -214,7 +216,6 @@
     data () {
       return {
         dataselected: false,
-        loading: false,
         homeworkcatData: {
           id: '',
           catname: ''

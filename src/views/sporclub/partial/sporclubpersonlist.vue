@@ -99,8 +99,10 @@
     VuetablePaginationInfo
   } from '@/Providers/defaultImports'
   import defaultImage from '@/assets/img/defaultavatar.png'
+  import loadingMixins from '@/mixins/loading'
 
   export default {
+    mixins: [loadingMixins],
     name: 'sporclubpersonlist',
     data () {
       return {
@@ -108,7 +110,6 @@
         currentData: [],
         moreParams: {},
         txt: '',
-        loading: false,
         personHeader: [
           {
             name: '__sequence',
@@ -180,11 +181,11 @@
         }
       },
       exportallData () {
-        this.loading = true
+        this.onOpenIndıcator()
         this.$store
           .dispatch('fetchAllPersonsExport', { id: this.$route.params.id })
           .then(res => {
-            this.loading = false
+            this.onCloseIndıcator()
             if (res.data.length > 0 && res.status == 200) {
               let data = res.data
               let header = [
@@ -212,7 +213,7 @@
             }
           })
           .catch(err => {
-            this.loading = false
+            this.onCloseIndıcator()
           })
       },
       onChangePage (page) {
@@ -221,7 +222,7 @@
       onSuccess () {
       },
       onError (err) {
-        this.loading = false
+        this.onCloseIndıcator()
         appPlugin.showalert(this.$t('fetchError'), '', 'error', this.$t('ok'))
       },
       onPaginationData (paginationData) {
@@ -229,10 +230,10 @@
         this.$refs.paginationInfo.setPaginationData(paginationData)
       },
       onLoading () {
-        this.loading = true
+        this.onOpenIndıcator()
       },
       onLoaded () {
-        this.loading = false
+        this.onCloseIndıcator()
       },
       onSearchHandler (txt) {
         this.txt = txt
@@ -264,7 +265,7 @@
           showCancelButton: true
         }).then(res => {
           if (res.value) {
-            this.loading = true
+            this.onOpenIndıcator()
             this.$store
               .dispatch('deleteUserSporClub', {
                 index: i,
@@ -275,7 +276,7 @@
                 if (res.status) {
                   if (res.status == 200) {
                     this.onRefreshTableContent()
-                    this.loading = false
+                    this.onCloseIndıcator()
                     appPlugin.showalert(
                       this.$t('deleteRecordMsg'),
                       '',
@@ -284,7 +285,7 @@
                     )
                   }
                 } else {
-                  this.loading = false
+                  this.onCloseIndıcator()
                   appPlugin.showalert(
                     this.$t('deleteRecordErrMsg'),
                     '',
@@ -294,7 +295,7 @@
                 }
               })
               .catch(err => {
-                this.loading = false
+                this.onCloseIndıcator()
                 appPlugin.showalert(
                   this.$t('deleteRecordErrMsg'),
                   '',

@@ -128,11 +128,12 @@
   import moment from 'moment'
   import { Datetime } from 'vue-datetime'
   import { UPDATE_DISCONT } from '@/store/modules/discontinuity/moduleNames'
+  import loadingMixins from '@/mixins/loading'
 
   export default {
     data () {
       return {
-        loading: false,
+
         selectedschool: '',
         selectedclass: '',
         selectedptype: 1,
@@ -143,9 +144,9 @@
         studentData: []
       }
     },
+    mixins: [loadingMixins],
     methods: {
       setDiscontStudent () {
-        debugger
         let data = []
         //contentid
         //type
@@ -157,13 +158,15 @@
             })
           })
         }
+        this.onOpenIndıcator()
         this.$store.dispatch(UPDATE_DISCONT, { studentList: data, type: 1 }).then((res) => {
-          this.loading = false
+          this.onCloseIndıcator()
+
           this.onReset()
           appPlugin.showalert(this.$t('userinfo'), this.$t('updateSuccesMsg'), 'success', this.$t('ok'))
 
         }).catch((err) => {
-          this.loading = false
+          this.onCloseIndıcator()
           appPlugin.showalert(this.$t('warning'), this.$t('updateErrorMsg'), 'error', this.$t('ok'))
 
         })
@@ -185,8 +188,7 @@
         } else if (this.today == '') {
           appPlugin.showalert(this.$t('warning'), this.$t('setstartdate'), 'info', this.$t('ok'))
         } else {
-          debugger
-          this.loading = true
+          this.onOpenIndıcator()
           this.$store.dispatch(FETCH_STUDENT_DISCONT_STATUS, {
             date: moment(this.today).format('YYYY-MM-DD'),
             schoolid: this.selectedschool.id,
@@ -194,7 +196,7 @@
             branchid: this.selectedclass.branches_id,
             type: this.selectedptype
           }).then((res) => {
-            this.loading = false
+            this.onCloseIndıcator()
             if (Object.keys(res.data).length > 0) {
               this.keys = Object.keys(res.data)
               this.studentData = res.data
@@ -202,7 +204,7 @@
               appPlugin.showalert(this.$t('warning'), this.$t('noData'), 'info', this.$t('ok'))
             }
           }).catch((err) => {
-            this.loading = false
+            this.onCloseIndıcator()
             appPlugin.showalert(this.$t('warning'), this.$t('getRecordErro'), 'error', this.$t('ok'))
           })
         }
@@ -210,7 +212,7 @@
       onChangeSchool (data) {
         this.schoolClasBranchData = []
         this.selectedclass = ''
-        this.loading = true
+        this.onOpenIndıcator()
         this.$store.dispatch(FETCH_ALL_SCHOOL_CLASES_BRANCHES_PIVOT, {
           urlparse: appPlugin.urlParse('school_id=' + data.id)
         }).then((res) => {
@@ -220,9 +222,9 @@
             })
             this.schoolClasBranchData = res.data
           }
-          this.loading = false
+          this.onCloseIndıcator()
         }).catch((err) => {
-          this.loading = false
+          this.onCloseIndıcator()
           appPlugin.showalert(this.$t('warning'), this.$t('getRecordErro'), 'error', this.$t('ok'))
 
         })
@@ -244,27 +246,27 @@
 
     },
     created () {
-      this.loading = true
+      this.onOpenIndıcator()
 
       this.$store
         .dispatch(FETCH_DTYPE)
         .then(res => {
-          this.loading = false
+          this.onCloseIndıcator()
         })
         .catch(err => {
           appPlugin.showalert(this.$t('warning'), this.$t('getRecordErro', 'eror', this.$t('ok')))
-          this.loading = false
+          this.onCloseIndıcator()
         })
       this.$store.dispatch(FETCH_SCHOOL_P_TYPE).then((res) => {
-        this.loading = false
+        this.onCloseIndıcator()
       }).catch((err) => {
-        this.loading = false
+        this.onCloseIndıcator()
         appPlugin.showalert(this.$t('warning'), this.$t('getRecordErro', 'eror', this.$t('ok')))
       })
       this.$store.dispatch(FETCH_ALL_SCHOOLS).then((res) => {
-        this.loading = false
+        this.onCloseIndıcator()
       }).catch((err) => {
-        this.loading = false
+        this.onCloseIndıcator()
         appPlugin.showalert(this.$t('warning'), this.$t('getRecordErro', 'eror', this.$t('ok')))
       })
     },

@@ -73,205 +73,208 @@
 </template>
 
 <script>
-import SearchBox from "@/components/searchBox";
-import Loading from "@/components/loading";
-import VTooltipButton from "@/components/tooltipButton";
-import VTabContent from "@/components/tabbarcontent";
-import appPlugin from "@/Providers/appPlugins";
-import Vuetable from "vuetable-2/src/components/Vuetable";
-import VuetablePaginationBootstrap from "@/components/datatable/VuetablePaginationBootstrap";
-import VuetablePaginationInfo from "@/components/datatable/VuetablePaginationInfo";
-import Flex from "@/components/layout";
-import tooltip from "@/components/tooltip";
-import FlexCard from "@/components/flexwithcard";
-import Swal from "sweetalert2";
+  import SearchBox from '@/components/searchBox'
+  import Loading from '@/components/loading'
+  import VTooltipButton from '@/components/tooltipButton'
+  import VTabContent from '@/components/tabbarcontent'
+  import appPlugin from '@/Providers/appPlugins'
+  import Vuetable from 'vuetable-2/src/components/Vuetable'
+  import VuetablePaginationBootstrap from '@/components/datatable/VuetablePaginationBootstrap'
+  import VuetablePaginationInfo from '@/components/datatable/VuetablePaginationInfo'
+  import Flex from '@/components/layout'
+  import tooltip from '@/components/tooltip'
+  import FlexCard from '@/components/flexwithcard'
+  import Swal from 'sweetalert2'
+  import loadingMixins from '@/mixins/loading'
 
-export default {
-  components: {
-    Flex,
-    FlexCard,
-    tooltip,
-    VTabContent,
-    SearchBox,
-    Loading,
-    VTooltipButton,
-    Vuetable,
-    VuetablePaginationBootstrap,
-    VuetablePaginationInfo
-  },
-  data() {
-    return {
-      uscbmoreParams: {},
-      txt: "",
-      currentData: [],
-      loading: false
-    };
-  },
-  props: {
-    showDelete: {},
-    user: {},
-    tabKey: {},
-    icon: {},
-    title: {},
-    onUserSchoolClasesBranchRefreshTableContent: {
-      type: Function
+  export default {
+    mixins: [loadingMixins],
+    components: {
+      Flex,
+      FlexCard,
+      tooltip,
+      VTabContent,
+      SearchBox,
+      Loading,
+      VTooltipButton,
+      Vuetable,
+      VuetablePaginationBootstrap,
+      VuetablePaginationInfo
     },
-    loadSchoolTask: {},
-    onreset: {}
-  },
-  watch: {
-    onreset: function(val) {
-      if (val == true) {
-        this.onRefresh();
-      }
-    }
-  },
-  methods: {
-    exportExcel() {
-      let data = this.currentData.data.data;
-      if (data.length < 1) {
-        appPlugin.showalert(
-          "Uyarı",
-          "Excele Veri Aktarmak İçin Tabloda Verileriniz Olması Gerekmektedir",
-          "info",
-          "Tamam"
-        );
-      } else {
-        let keys = ["sCode", "sName", "cCode", "cName", "bCode", "bName"];
-        const header = [
-          "Okul Kodu",
-          "Okul Adı",
-          "Sınıf Kodu",
-          "Sınıf Adı",
-          "Şube Kodu",
-          "Şube Adı"
-        ];
-        appPlugin.exportExcelTable(
-          data,
-          this.user[0].uName.toUpperCase() +
-            " " +
-            this.user[0].uSurname.toUpperCase() +
-            " " +
-            " Görevli Olduğu Şubeler",
-          14,
-          keys,
-          header
-        );
+    data () {
+      return {
+        uscbmoreParams: {},
+        txt: '',
+        currentData: [],
       }
     },
-    allExportExcel() {
-      //TODO
+    props: {
+      showDelete: {},
+      user: {},
+      tabKey: {},
+      icon: {},
+      title: {},
+      onUserSchoolClasesBranchRefreshTableContent: {
+        type: Function
+      },
+      loadSchoolTask: {},
+      onreset: {}
     },
-    onRefresh() {
-      this.$refs.vuetable4.reload();
-    },
-    onUserSchoolClasesBranchesSucces() {},
-    onUserSchoolClasesBranchesError(err) {
-      this.loading = false;
-      appPlugin.showalert(this.$t("getRecordErro"), "", "error", this.$t("ok"));
-    },
-    onUserSchoolClasesBranchesLoading() {
-      this.loading = true;
-    },
-    onUserSchoolClasesBranchesLoaded() {
-      this.loading = false;
-    },
-    onDeleteUserSchoolClasesBranches(item, i) {
-      Swal.fire({
-        title:
-          this.$t("personname") +
-          this.user[0].uName.toUpperCase() +
-          " " +
-          " " +
-          this.user[0].uSurname.toUpperCase() +
-          "\n " +
-          this.$t("branchname") +
-          item.bName +
-          " \n" +
-          this.$t("sureDelete"),
-        confirmButtonText: this.$t("yes"),
-        confirmButtonColor: "red",
-        cancelButtonText: this.$t("cancel"),
-        icon: "warning",
-        showCancelButton: true
-      }).then(res => {
-        if (res.value) {
-          this.loading = true;
-          this.$store
-            .dispatch("deleteUserSchoolClasesBranches", {
-              deleted: item,
-              index: i
-            })
-            .then(res => {
-              if (res.status) {
-                if (res.status === 200) {
-                  appPlugin.showalert(
-                    this.$t("deleteRecordMsg"),
-                    "",
-                    "success",
-                    this.$t("ok")
-                  );
-                }
-              } else {
-                appPlugin.showalert(
-                  this.$t("deleteRecordErrMsg"),
-                  "",
-                  "error",
-                  this.$t("ok")
-                );
-              }
-              this.$refs.vuetable4.reload();
-              this.loading = false;
-            });
+    watch: {
+      onreset: function (val) {
+        if (val == true) {
+          this.onRefresh()
         }
-      });
+      }
     },
-    onUserSchoolClasesBranchesChangePage(page) {
-      this.$refs.vuetable4.changePage(page);
-    },
-    onUserSchoolClasesBranchesPaginationData(paginationData) {
-      this.$refs.pagination4.setPaginationData(paginationData);
-      this.$refs.paginationInfo4.setPaginationData(paginationData);
-    },
-    onFetchUserSchoolClasesBranches(apiUrl, httpOptions) {
-      if (this.onreset) {
-        var data;
-        if (this.txt.trim() != "") {
-          if (isNaN(+this.$route.params.id) == false) {
-            data = this.$store.dispatch("getUserSchoolClasesBranchesU", {
-              httpOpt: httpOptions,
-              query: appPlugin.urlParse(
-                "bName%" + this.txt + "& user_id=" + this.$route.params.id
-              )
-            });
-            data.then(res => {
-              console.log("lalal", res);
-              this.currentData = res;
-            });
-            return data;
-          }
+    methods: {
+      exportExcel () {
+        let data = this.currentData.data.data
+        if (data.length < 1) {
+          appPlugin.showalert(
+            'Uyarı',
+            'Excele Veri Aktarmak İçin Tabloda Verileriniz Olması Gerekmektedir',
+            'info',
+            'Tamam'
+          )
         } else {
-          if (isNaN(+this.$route.params.id) == false) {
-            data = this.$store.dispatch("getUserSchoolClasesBranchesU", {
-              httpOpt: httpOptions,
-              query: appPlugin.urlParse("user_id=" + this.$route.params.id)
-            });
-            data.then(res => {
-              this.currentData = res;
-            });
-            return data;
+          let keys = ['sCode', 'sName', 'cCode', 'cName', 'bCode', 'bName']
+          const header = [
+            'Okul Kodu',
+            'Okul Adı',
+            'Sınıf Kodu',
+            'Sınıf Adı',
+            'Şube Kodu',
+            'Şube Adı'
+          ]
+          appPlugin.exportExcelTable(
+            data,
+            this.user[0].uName.toUpperCase() +
+            ' ' +
+            this.user[0].uSurname.toUpperCase() +
+            ' ' +
+            ' Görevli Olduğu Şubeler',
+            14,
+            keys,
+            header
+          )
+        }
+      },
+      allExportExcel () {
+        //TODO
+      },
+      onRefresh () {
+        this.$refs.vuetable4.reload()
+      },
+      onUserSchoolClasesBranchesSucces () {
+      },
+      onUserSchoolClasesBranchesError (err) {
+        this.onCloseIndıcator()
+        appPlugin.showalert(this.$t('getRecordErro'), '', 'error', this.$t('ok'))
+      },
+      onUserSchoolClasesBranchesLoading () {
+        this.onOpenIndıcator()
+
+      },
+      onUserSchoolClasesBranchesLoaded () {
+        this.onCloseIndıcator()
+      },
+      onDeleteUserSchoolClasesBranches (item, i) {
+        Swal.fire({
+          title:
+            this.$t('personname') +
+            this.user[0].uName.toUpperCase() +
+            ' ' +
+            ' ' +
+            this.user[0].uSurname.toUpperCase() +
+            '\n ' +
+            this.$t('branchname') +
+            item.bName +
+            ' \n' +
+            this.$t('sureDelete'),
+          confirmButtonText: this.$t('yes'),
+          confirmButtonColor: 'red',
+          cancelButtonText: this.$t('cancel'),
+          icon: 'warning',
+          showCancelButton: true
+        }).then(res => {
+          if (res.value) {
+            this.onOpenIndıcator()
+            this.$store
+              .dispatch('deleteUserSchoolClasesBranches', {
+                deleted: item,
+                index: i
+              })
+              .then(res => {
+                if (res.status) {
+                  if (res.status === 200) {
+                    appPlugin.showalert(
+                      this.$t('deleteRecordMsg'),
+                      '',
+                      'success',
+                      this.$t('ok')
+                    )
+                  }
+                } else {
+                  appPlugin.showalert(
+                    this.$t('deleteRecordErrMsg'),
+                    '',
+                    'error',
+                    this.$t('ok')
+                  )
+                }
+                this.$refs.vuetable4.reload()
+                this.onCloseIndıcator()
+              })
+          }
+        })
+      },
+      onUserSchoolClasesBranchesChangePage (page) {
+        this.$refs.vuetable4.changePage(page)
+      },
+      onUserSchoolClasesBranchesPaginationData (paginationData) {
+        this.$refs.pagination4.setPaginationData(paginationData)
+        this.$refs.paginationInfo4.setPaginationData(paginationData)
+      },
+      onFetchUserSchoolClasesBranches (apiUrl, httpOptions) {
+        if (this.onreset) {
+          var data
+          if (this.txt.trim() != '') {
+            if (isNaN(+this.$route.params.id) == false) {
+              data = this.$store.dispatch('getUserSchoolClasesBranchesU', {
+                httpOpt: httpOptions,
+                query: appPlugin.urlParse(
+                  'bName%' + this.txt + '& user_id=' + this.$route.params.id
+                )
+              })
+              data.then(res => {
+                console.log('lalal', res)
+                this.currentData = res
+              })
+              return data
+            }
+          } else {
+            if (isNaN(+this.$route.params.id) == false) {
+              data = this.$store.dispatch('getUserSchoolClasesBranchesU', {
+                httpOpt: httpOptions,
+                query: appPlugin.urlParse('user_id=' + this.$route.params.id)
+              })
+              data.then(res => {
+                this.currentData = res
+              })
+              return data
+            }
           }
         }
+      },
+      onUserSchoolClasesBranchesSearch (txt) {
+        this.txt = txt
+        this.$nextTick(function () {
+          this.$refs.vuetable4.refresh()
+        })
       }
-    },
-    onUserSchoolClasesBranchesSearch(txt) {
-      this.txt = txt;
-      this.$nextTick(function() {
-        this.$refs.vuetable4.refresh();
-      });
     }
   }
-};
 </script>
 
 <style scoped>

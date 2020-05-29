@@ -786,10 +786,10 @@ import UserActivityWeekClases from "./partial/useractivityclasestask";
 import SporClubTab from "./partial/sporclubtasktable";
 import SporClubTeamTab from "./partial/sporclubteambranchtasktable";
 import SporClubTaskCreate from "./partial/sporclubtaskcreate";
-
+import loadingMixins from '@/mixins/loading'
 export default {
   created() {
-    this.loading = true;
+    this.onOpenIndıcator();
     if (isNaN(+this.$route.params.id) == false) {
       this.$store.dispatch("fetchAllTitles");
       this.$store.dispatch("fetchAllProvince");
@@ -797,11 +797,12 @@ export default {
       this.$store.dispatch("fetchUserRelationActivity");
       this.getPerson();
     } else {
-      this.loading = false;
+      this.onCloseIndıcator();
       appPlugin.showalert(this.$t("invalidparam"), "", "error", this.$t("ok"));
       this.$router.replace("/createpersons");
     }
   },
+  mixins:[loadingMixins],
   validations: {
     personData: {
       personName: {
@@ -918,7 +919,7 @@ export default {
           /*  this.personData.schools.push(this.personSchoolData)
               this.personSchoolData.clases = this.personClasesData
               this.personSchoolData.lessons = this.personLessonData
-              this.loading = true
+              this.onOpenIndıcator()
               this.addSchoolUserData(this.$route.params.id)*/
         }
       }
@@ -939,7 +940,7 @@ export default {
           this.personData.schools.push(this.personSchoolData);
           this.personSchoolData.clases = this.personClasesData;
           this.personSchoolData.lessons = this.personLessonData;
-          this.loading = true;
+          this.onOpenIndıcator();
           this.addSchoolUserData(this.$route.params.id);
         }
       } else {
@@ -957,7 +958,7 @@ export default {
       }
     },
     addUserSchoolClasesBranchesData(userId) {
-      this.loading = true;
+      this.onOpenIndıcator();
       this.personData.schools.forEach(item => {
         var data = [];
         item.clases.forEach(clases => {
@@ -994,7 +995,7 @@ export default {
                 this.personSchoolData = [];
                 this.personClasesData = [];
                 this.personLessonData = [];
-                this.loading = false;
+                this.onCloseIndıcator();
               }
             } else {
               appPlugin.showalert(
@@ -1003,11 +1004,11 @@ export default {
                 "error",
                 this.$t("ok")
               );
-              this.loading = false;
+              this.onCloseIndıcator();
             }
           })
           .catch(err => {
-            this.loading = false;
+            this.onCloseIndıcator();
             appPlugin.showalert(
               this.$t("persontaskerror1"),
               "",
@@ -1019,7 +1020,7 @@ export default {
       });
     },
     addUserSchoolClasesData(userId) {
-      this.loading = true;
+      this.onOpenIndıcator();
       this.addUserSchoolClasesBranchesData(userId);
       this.personData.schools.forEach(item => {
         var data = [];
@@ -1037,10 +1038,10 @@ export default {
           .then(res => {
             if (res.status) {
               if (res.status == 200) {
-                this.loading = false;
+                this.onCloseIndıcator();
               }
             } else {
-              this.loading = false;
+              this.onCloseIndıcator();
               appPlugin.showalert(
                 this.$t("persontaskerror2"),
                 "",
@@ -1050,7 +1051,7 @@ export default {
             }
           })
           .catch(err => {
-            this.loading = false;
+            this.onCloseIndıcator();
             appPlugin.showalert(
               this.$t("persontaskerror2"),
               "",
@@ -1061,7 +1062,7 @@ export default {
       });
     },
     addUserSchoolLessonData(userId) {
-      this.loading = true;
+      this.onOpenIndıcator();
       this.addUserSchoolClasesData(userId);
       this.personData.schools.forEach(item => {
         var data = [];
@@ -1079,17 +1080,17 @@ export default {
           .then(res => {
             if (res.status) {
               if (res.status == 200) {
-                this.loading = false;
+                this.onCloseIndıcator();
               } else {
-                this.loading = false;
+                this.onCloseIndıcator();
               }
             } else {
-              this.loading = false;
+              this.onCloseIndıcator();
             }
             console.log("userokulders", res.status);
           })
           .catch(err => {
-            this.loading = false;
+            this.onCloseIndıcator();
             appPlugin.showalert(
               this.$t("persontaskerror3"),
               "",
@@ -1101,7 +1102,7 @@ export default {
       });
     },
     addLessonUserData(userId) {
-      this.loading = true;
+      this.onOpenIndıcator();
       let data = [];
       let lessonsData = [];
       this.personData.schools.forEach(item => {
@@ -1118,11 +1119,11 @@ export default {
         .then(res => {
           if (res.status) {
             if (res.status == 200) {
-              this.loading = false;
+              this.onCloseIndıcator();
               this.addUserSchoolLessonData(userId);
             }
           } else {
-            this.loading = false;
+            this.onCloseIndıcator();
             appPlugin.showalert(
               this.$t("persontaskerror4"),
               "",
@@ -1132,7 +1133,7 @@ export default {
           }
         })
         .catch(err => {
-          this.loading = false;
+          this.onCloseIndıcator();
           appPlugin.showalert(
             this.$t("persontaskerror4"),
             "",
@@ -1156,7 +1157,7 @@ export default {
         .then(res => {
           if (res.status) {
             if (res.status == 200) {
-              this.loading = false;
+              this.onCloseIndıcator();
               if (this.schoolTaskStatus == 0) {
                 this.addLessonUserData(userID);
               } else {
@@ -1174,7 +1175,7 @@ export default {
               );
             }
           } else {
-            this.loading = false;
+            this.onCloseIndıcator();
             appPlugin.showalert(
               this.$t("persontaskerror5"),
               "",
@@ -1184,7 +1185,7 @@ export default {
           }
         })
         .catch(err => {
-          this.loading = false;
+          this.onCloseIndıcator();
           appPlugin.showalert(
             this.$t("persontaskerror5"),
             "",
@@ -1218,9 +1219,9 @@ export default {
       this.createSchoolTask = false;
     },
     createNewSporClubTask() {
-      this.loading = true;
+      this.onOpenIndıcator();
       this.$store.dispatch("fetchAllSporClubs");
-      this.loading = false;
+      this.onCloseIndıcator();
       this.showSporClubTask = false;
       this.createSporClubTask = true;
 
@@ -1238,7 +1239,7 @@ export default {
     },
     onChangeSchool(data) {
       if (this.schoolTaskStatus == 0) {
-        this.loading = true;
+        this.onOpenIndıcator();
         this.personClasesData = [];
         this.personLessonData = [];
         this.$store
@@ -1252,10 +1253,10 @@ export default {
               });
               this.schoolClasBranchData = res.data;
             }
-            this.loading = false;
+            this.onCloseIndıcator();
           })
           .catch(err => {
-            this.loading = false;
+            this.onCloseIndıcator();
           });
         this.$store
           .dispatch("fetchAllSchoolLessonsPivot", {
@@ -1265,7 +1266,7 @@ export default {
             this.schoolLessonsData = res.data;
           })
           .catch(err => {
-            this.loading = false;
+            this.onCloseIndıcator();
           });
 
         if (this.personData.schools.length > 0) {
@@ -1409,7 +1410,7 @@ export default {
       }
     },
     updatePerson() {
-      this.loading = true;
+      this.onOpenIndıcator();
       let data = {
         id: this.personData.id,
         name: this.personData.personName,
@@ -1465,9 +1466,9 @@ export default {
                 "success",
                 this.$t("ok")
               );
-              this.loading = false;
+              this.onCloseIndıcator();
             } else if (res.status == 204) {
-              this.loading = false;
+              this.onCloseIndıcator();
               appPlugin.showalert(
                 this.$t("warning"),
                 this.$t("personeditrecordcontrolerror"),
@@ -1476,7 +1477,7 @@ export default {
               );
             }
           } else {
-            this.loading = false;
+            this.onCloseIndıcator();
             appPlugin.showalert(
               this.$t("updateErrorMsg"),
               "",
@@ -1486,7 +1487,7 @@ export default {
           }
         })
         .catch(err => {
-          this.loading = false;
+          this.onCloseIndıcator();
           appPlugin.showalert(
             this.$t("updateErrorMsg"),
             "",
@@ -1597,13 +1598,13 @@ export default {
       }
     },
     fetchScoolData() {
-      this.loading = true;
+      this.onOpenIndıcator();
       this.$store.dispatch("fetchAllSchools").then(res => {});
       this.$store.dispatch("fetchAllSchoolAllClasesPivot").then(res => {
         if (res.status && res.data) {
         }
       });
-      this.loading = false;
+
     },
     getPerson() {
       this.$store
@@ -1637,17 +1638,17 @@ export default {
               this.personData.birthday = this.user[0].uBirthDay;
               this.personData.isActive = this.user[0].uİsActive;
               this.personData.proximities = this.user[0].uproximities_id;
-              this.loading = false;
+              this.onCloseIndıcator();
             } else {
               this.$router.push("/persons");
-              this.loading = false;
+              this.onCloseIndıcator();
             }
           } else {
-            this.loading = false;
+            this.onCloseIndıcator();
           }
         })
         .catch(err => {
-          this.loading = false;
+          this.onCloseIndıcator();
         });
     }
   },
@@ -1686,7 +1687,6 @@ export default {
       activeTab: 0,
       activityTaskStatus: 0,
       user: [],
-      loading: false,
       defaultPreview: defaultImage,
       personData: {
         notificationType: {

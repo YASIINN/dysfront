@@ -413,14 +413,17 @@
     VuetablePaginationInfo,
     appPlugin
   } from '@/Providers/defaultImports'
+  import loadingMixins from '@/mixins/loading'
 
   export default {
+    mixins: [loadingMixins],
     created () {
-      this.loading = true
+      this.onOpenIndıcator()
+
       if (isNaN(+this.$route.params.id) == false) {
         this.getPerson()
       } else {
-        this.loading = false
+        this.onCloseIndıcator()
         appPlugin.showalert('Geçersiz Parametre', '', 'error', 'Tamam')
         this.$router.replace('/createpersons')
       }
@@ -440,17 +443,17 @@
       },
       getParentActiveTab (data) {
         if (data.componentOptions.propsData.tabKey == 'personStudent') {
-          this.loading = true
+          this.onOpenIndıcator()
           this.$store
             .dispatch('fetchPersonStudents', { id: this.user[0].id })
             .then(res => {
-              this.loading = false
+              this.onCloseIndıcator()
               if (res.status && res.status == 200 && res.data) {
                 this.studentList = res.data
               }
             })
             .catch(err => {
-              this.loading = false
+              this.onCloseIndıcator()
 
               appPlugin.showalert(
                 this.$t('warning'),
@@ -568,17 +571,17 @@
                 })
                 this.user = res.data
                 //this.$store.getters.getUsers
-                this.loading = false
+                this.onCloseIndıcator()
               } else {
                 this.$router.push('/persons')
-                this.loading = false
+                this.onCloseIndıcator()
               }
             } else {
-              this.loading = false
+              this.onCloseIndıcator()
             }
           })
           .catch(err => {
-            this.loading = false
+            this.onCloseIndıcator()
           })
       }
     },
@@ -606,7 +609,7 @@
         currentData: [],
         activeTab: 0,
         studentreset: false,
-        loading: false
+
       }
     },
     name: 'persondetail',

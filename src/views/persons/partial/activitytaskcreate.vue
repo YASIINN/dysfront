@@ -104,8 +104,10 @@
     VuetablePaginationInfo,
     appPlugin
   } from '@/Providers/defaultImports'
+  import loadingMixins from '@/mixins/loading'
 
   export default {
+    mixins: [loadingMixins],
     props: {
       user: {}
     },
@@ -116,29 +118,30 @@
     },
     methods: {
       getActivityWeekLessons () {
-        this.loading = true
+         this.onOpenIndıcator()
         this.$store.dispatch('fetchActivityWeekLesson', {
           query: appPlugin.urlParse('activity_id=' + this.personActivityData.id + '& pCode=' + this.activityweekData[0].pCode)
         }).then((res) => {
-          this.loading = false
+          this.onCloseIndıcator()
+
           this.activityLessonData = res.data
         }).catch((err) => {
-          this.loading = false
+          this.onCloseIndıcator()
         })
       },
 
       onChangeWeek (item) {
-        this.loading = true
+         this.onOpenIndıcator()
         this.getActivityWeekLessons()
         this.activityClasesWeekClasesData = item
-        this.loading = false
+        this.onCloseIndıcator()
       },
       onTouch () {
         //TODO
         this.isTouched = true
       },
       addActivityUserPeriod (userID) {
-        this.loading = true
+         this.onOpenIndıcator()
         this.$store.dispatch('createUserActivityPeriod', {
           userid: userID,
           activityid: this.personActivityData.id,
@@ -149,21 +152,21 @@
             if (res.status == 200) {
 
               this.addActivityUserClases(userID)
-              this.loading = false
+              this.onCloseIndıcator()
             }
           } else {
-            this.loading = false
+            this.onCloseIndıcator()
             appPlugin.showalert('Personel Faaliyet Dönemlerine Eklenirken Hata Gerçekleşti', '', 'error', 'Tamam')
 
           }
         }).catch((err) => {
-          this.loading = false
+          this.onCloseIndıcator()
           appPlugin.showalert('Personel Faaliyet Dönemlerine Eklenirken Hata Gerçekleşti', '', 'error', 'Tamam')
         })
       },
       addActivityUserLessons (userID) {
         let data = []
-        this.loading = true
+         this.onOpenIndıcator()
         this.activityLessons.forEach((item) => {
           data.push({
             lessonid: item.lessons_id,
@@ -183,7 +186,7 @@
               this.activityweekData = []
               this.groupedData = {}
               this.personActivityData = {}
-              this.loading = false
+              this.onCloseIndıcator()
             }
           } else {
             appPlugin.showalert('Personel Faaliyet Derslerine Eklenirken Hata Gerçekleşti', '', 'error', 'Tamam')
@@ -193,7 +196,7 @@
         })
       },
       addActivityUserClases (userID) {
-        this.loading = true
+         this.onOpenIndıcator()
         let data = []
         this.activityClases.forEach((item) => {
           data.push({
@@ -208,19 +211,19 @@
           if (res.status) {
             if (res.status == 200) {
               this.addActivityUserLessons(userID)
-              this.loading = false
+              this.onCloseIndıcator()
             }
           } else {
-            this.loading = false
+            this.onCloseIndıcator()
             appPlugin.showalert('Personel Faaliyet Sınıflarına Eklenirken Hata Gerçekleşti', '', 'error', 'Tamam')
           }
         }).catch((err) => {
-          this.loading = false
+          this.onCloseIndıcator()
           appPlugin.showalert('Personel Faaliyet Sınıflarına Eklenirken Hata Gerçekleşti', '', 'error', 'Tamam')
         })
       },
       addActivityUserData (userID) {
-        this.loading = true
+         this.onOpenIndıcator()
         /*   this.user.uStatus.activity = true*/
         /*     this.$store
                .dispatch('updatePersonStatus', {
@@ -238,18 +241,18 @@
               if (this.activityTaskStatus == 1) {
                 this.personActivityData = []
                 appPlugin.showalert('Personel Görevlendirme İşlemi Başarılı', '', 'success', 'Tamam')
-                this.loading = false
+                this.onCloseIndıcator()
               } else {
                 this.addActivityUserPeriod(userID)
-                this.loading = false
+                this.onCloseIndıcator()
               }
             }
           } else {
-            this.loading = false
+            this.onCloseIndıcator()
             appPlugin.showalert('Personel Faaliyetlere Eklenirken Hata Gerçekleşti', '', 'error', 'Tamam')
           }
         }).catch((err) => {
-          this.loading = false
+          this.onCloseIndıcator()
           appPlugin.showalert('Personel Faaliyetlere Eklenirken Hata Gerçekleşti', '', 'error', 'Tamam')
         })
         /*      } else {
@@ -276,7 +279,7 @@
           } else if (this.activityLessons.length < 1) {
             appPlugin.showalert('Uyarı', 'Lütfen Personelin Görevli Olduğu Dersleri Seçiniz', 'info', 'Tamam')
           } else {
-            this.loading = true
+             this.onOpenIndıcator()
             console.log('personel edit', this.user)
             this.addActivityUserData(this.user.id)
           }
@@ -284,7 +287,7 @@
           if (!this.personActivityData.id) {
             appPlugin.showalert('Uyarı', 'Lütfen Personelin Görevli Olduğu Faaliyeti Seçiniz', 'info', 'Tamam')
           } else {
-            this.loading = true
+             this.onOpenIndıcator()
             this.addActivityUserData(this.user.id)
           }
         }
@@ -312,7 +315,6 @@
       return {
         activityweekData: 0,
         groupedData: {},
-        loading: false,
         activityTaskStatus: '0',
         personActivityData: [],
         activityClasesWeekClasesData: [],

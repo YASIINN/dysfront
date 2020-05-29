@@ -69,10 +69,12 @@
   import Activityforclass from './partial/activityforclass'
   import Activityforstudentsd from './partial/activityforstudents'
   import Activitydstatus from './partial/activitydstatus'
+  import loadingMixins from '@/mixins/loading'
 
   export default {
     created () {
     },
+    mixins: [loadingMixins],
     methods: {
       getActiveTabs () {
         localStorage.removeItem('sData')
@@ -119,7 +121,6 @@
       return {
         today: new Date(),
         ontouch: false,
-        loading: false
       }
     }
   }

@@ -143,6 +143,7 @@
     appPlugin
   } from '@/Providers/defaultImports'
   import { FETCH_STUDENT_FOR_D } from '@/store/modules/discontinuity/moduleNames'
+  import loadingMixins from '@/mixins/loading'
 
   export default {
     components: {
@@ -162,6 +163,7 @@
       VuetablePaginationInfo,
       Datetime
     },
+    mixins: [loadingMixins],
     methods: {
       onChangeFilter (item, i, k) {
         //TODO AYNISI OKUL TARAFINA DA YAPILACAK
@@ -196,16 +198,15 @@
           appPlugin.showalert(this.$t('warning'), this.$t('selectstudent'), 'warning', this.$t('ok'))
         } else {
           debugger
+          this.onOpenIndıcator()
           this.$store.dispatch(FETCH_DTYPE).then((res) => {
             debugger
-            this.loading = false
+            this.onCloseIndıcator()
             res.data.unshift({ id: 0, dtName: 'Tümü' })
             this.dtypes = res.data
           }).catch((err) => {
-            this.loading = false
-
+            this.onCloseIndıcator()
             appPlugin.showalert(this.$t('warning'), this.$t('getRecordErro', 'eror', this.$t('ok')))
-
           })
           this.$store.dispatch(FETCH_STUDENT_FOR_D, {
             studentid: this.selectedStudent.id,
@@ -225,10 +226,10 @@
             let storageData = JSON.parse(JSON.stringify(res.data))
             localStorage.setItem('sData', JSON.stringify(storageData))
             this.sdstudentlist = res.data
-            this.loading = false
+            this.onCloseIndıcator()
           }).catch((err) => {
             appPlugin.showalert(this.$t('warning'), this.$t('getRecordErro'), 'error', this.$t('ok'))
-            this.loading = false
+            this.onCloseIndıcator()
           })
         }
       },
@@ -259,7 +260,6 @@
         selectedStudent: '',
         students: [],
         sdstudentlist: [],
-        loading: false,
         isLoading: false,
         startdate: '',
         enddate: '',
