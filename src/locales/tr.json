@@ -251,5 +251,10 @@
   "setstartdate": "Başlangıç Tarihi Giriniz",
   "setenddate": "Bitiş Tarihi Giriniz",
   "selectstudent": "Öğrenci Seçiniz",
-  "userinfo": "Bilgilendirme"
+  "userinfo": "Bilgilendirme",
+  "creategroup": "Grup Ekle",
+  "entergroupname": "Grup Adı Giriniz",
+  "pleaseentergroupname": "Lütfen Grup Adı Giriniz",
+  "group": "Gruplar",
+  "searchgroup": "Grup adına göre ara"
 }

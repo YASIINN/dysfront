@@ -26,6 +26,7 @@ import testRouter from './testRouter'
 import listRouter from './listRouter'
 import postRouter from './postRouter'
 import activityRouter from './activityRouter'
+import groupRouter from './groupRouter'
 import posttagRouter from './posttagRouter'
 import homeworkcategoryRouter from './homeworkcategoryRouter'
 
@@ -88,6 +89,13 @@ const routes = [
   discontinuityRouter.routes.discountityCreate,
   discontinuityRouter.routes.discountityList,
   dtypesRouter.routes.dtypes,
+
+  groupRouter.routes.schoolgrouplist,
+  groupRouter.routes.clubgrouplist,
+  groupRouter.routes.activitygrouplist,
+  groupRouter.routes.customgrouplist,
+  groupRouter.routes.groupmemberlist,
+
   postRouter.routes.test,
   postRouter.routes.postlikes,
   postRouter.routes.postViews,
@@ -97,6 +105,7 @@ const routes = [
   posttagRouter.routes.posttag,
   postRouter.routes.specialnotes,
   homeworkcategoryRouter.routes.homeworkcat,
+
   { path: '*', redirect: '/not-found' }
 ]
 const router = new VueRouter({

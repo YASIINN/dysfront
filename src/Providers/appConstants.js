@@ -138,6 +138,36 @@ let routeData = [
     ],
     hashfragment: 'corparate'
   },
+
+  {
+    class: "text-indigo",
+    icon: "fa fa-home",
+    label: "Grup Yönetimi",
+    route: "",
+    subRoute: [
+      {
+        label: "Okul Grupları",
+        route: "/schoolgroup",
+        class: ""
+      },
+      {
+        label: "Spor Kulübü Grupları",
+        route: "/clubgroup",
+        class: ""
+      },
+      {
+        label: "Faaliyet Grupları",
+        route: "/activitygroup",
+        class: ""
+      },
+      {
+        label: "Özel Gruplar",
+        route: "/customgroup",
+        class: ""
+      }
+    ],
+    hashfragment: "schoolgroup"
+  },
   {
     class: 'text-info',
     icon: 'fa fa-home',

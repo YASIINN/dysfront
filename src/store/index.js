@@ -70,8 +70,13 @@ import post from './modules/post/index'
 import pnotification from './modules/pnotification'
 import homeworkcategory from './modules/homeworkcategory'
 //list
-import list from './modules/list/list'
-import dType from './modules/dtype/index'
+import list from "./modules/list/list";
+import dType from "./modules/dtype/index";
+import schoolgroup from './modules/groups/schoolgroup'
+import clubgroup from './modules/groups/clubgroup'
+import activitygroup from './modules/groups/activitygroup'
+import customgroup from './modules/groups/customgroup'
+import groupmembers from './modules/groups/groupmembers'
 
 export default new Vuex.Store({
   state: {
@@ -158,6 +163,11 @@ export default new Vuex.Store({
     clubphours: clubphours,
     clubprogram: clubprogram,
     clubpcontent: clubpcontent,
+    schoolgroup: schoolgroup,
+    clubgroup: clubgroup,
+    activitygroup: activitygroup,
+    customgroup: customgroup,
+    groupmembers: groupmembers,
     discontinuity,
     dType,
     posttype,
